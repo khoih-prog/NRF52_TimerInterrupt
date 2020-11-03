@@ -66,7 +66,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
    - [`EthernetLarge library v2.0.0+`](https://github.com/OPEnSLab-OSU/EthernetLarge) for W5100, W5200 and W5500. ***Ready*** from v1.0.1.
    - [`UIPEthernet library v2.0.9+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60.
  5. [`WiFiNINA_Generic library v1.7.1+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
- 6. [`Blynk_WiFiNINA_WM library 1.0.4+`](hhttps://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example.
+ 6. [`Blynk_WiFiNINA_WM library 1.0.4+`](hhttps://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
  
 ---
 ---
@@ -217,7 +217,7 @@ in loop(), using delay() function as an example. The elapsed time then is very u
 
 ## Supported Boards
 
-- NRF52832 and nRF52840
+- **NRF52832-based and nRF52840-based boards**
 
 ---
 
