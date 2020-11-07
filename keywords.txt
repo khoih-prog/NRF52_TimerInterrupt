@@ -7,7 +7,8 @@ NRF52Timer	KEYWORD1
 NRF52_ISRTimer KEYWORD1
 NRF52_ISR_Timer KEYWORD1
 NRF52TimerNumber KEYWORD1
-timer_callback  KEYWORD1
+timerCallback KEYWORD1
+timerCallback_p KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

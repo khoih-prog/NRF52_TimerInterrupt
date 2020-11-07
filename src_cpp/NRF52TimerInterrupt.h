@@ -19,11 +19,12 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
 
-   Version: 1.0.0
+   Version: 1.0.1
 
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
    1.0.0   K Hoang      02/11/2020 Initial coding
+   1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
 *****************************************************************************************************************************/
 /*
   nRF52 has 5 Hardware TIMERs: NRF_TIMER0-NRF_TIMER4
@@ -75,7 +76,7 @@
 #include <Arduino.h>
 #include "nrf_timer.h"
 
-#define NRF52_TIMER_INTERRUPT_VERSION       "1.0.0"
+#define NRF52_TIMER_INTERRUPT_VERSION       "1.0.1"
 
 #ifndef NRF52_TIMER_INTERRUPT_DEBUG
   #define NRF52_TIMER_INTERRUPT_DEBUG       0
@@ -85,7 +86,7 @@ class NRF52TimerInterrupt;
 
 typedef NRF52TimerInterrupt NRF52Timer;
 
-typedef void (*timer_callback)  (void);
+typedef void (*timerCallback)  (void);
 
 typedef enum
 {
@@ -139,7 +140,7 @@ class NRF52TimerInterrupt
     
     IRQn_Type              _timer_IRQ;
 
-    timer_callback        _callback;        // pointer to the callback function
+    timerCallback        _callback;        // pointer to the callback function
     
     // NRF_TIMER_FREQ_16MHz,NRF_TIMER_FREQ_8MHz,...,NRF_TIMER_FREQ_31250Hz
     nrf_timer_frequency_t _frequency_t = NRF_TIMER_FREQ_1MHz;
@@ -208,7 +209,7 @@ class NRF52TimerInterrupt
 
     // frequency (in hertz) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
-    bool setFrequency(float frequency, timer_callback callback)
+    bool setFrequency(float frequency, timerCallback callback)
     {
       // This function will be called when time out interrupt will occur
       if (callback) 
@@ -255,19 +256,19 @@ class NRF52TimerInterrupt
 
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
-    bool setInterval(unsigned long interval, timer_callback callback)
+    bool setInterval(unsigned long interval, timerCallback callback)
     {
       return setFrequency((float) (1000000.0f / interval), callback);
     }
 
-    bool attachInterrupt(float frequency, timer_callback callback)
+    bool attachInterrupt(float frequency, timerCallback callback)
     {
       return setFrequency(frequency, callback);
     }
 
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
-    bool attachInterruptInterval(unsigned long interval, timer_callback callback)
+    bool attachInterruptInterval(unsigned long interval, timerCallback callback)
     {
       return setFrequency( (float) ( 1000000.0f / interval), callback);
     }
@@ -329,7 +330,7 @@ class NRF52TimerInterrupt
       enableTimer();
     }
     
-    timer_callback getCallback(void)
+    timerCallback getCallback(void)
     {
       return _callback;
     }

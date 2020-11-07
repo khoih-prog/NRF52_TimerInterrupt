@@ -11,13 +11,15 @@
 
 ## Features
 
-This library enables you to use Interrupt from Hardware Timers on an NRF52-based board.
+This library enables you to use Interrupt from Hardware Timers on an nRF52-based board, such as AdaFruit Itsy-Bitsy nRF52840, Feather nRF52840 Express, etc.
+
+As **Hardware Timers are rare, and very precious assets** of any board, this library now enables you to use up to **16 ISR-based Timers, while consuming only 1 Hardware Timer**. Timers' interval is very long (**ulong millisecs**).
 
 ### Why do we need this Hardware Timer Interrupt?
 
 Imagine you have a system with a **mission-critical** function, measuring water level and control the sump pump or doing something much more important. You normally use a software timer to poll, or even place the function in loop(). But what if another function is **blocking** the loop() or setup().
 
-So your function **might not be executed, and the result would be disastrous.**
+So your function **might not be executed on-time or not at all, and the result would be disastrous.**
 
 You'd prefer to have your function called, no matter what happening with other functions (busy loop, bug, etc.).
 
@@ -41,6 +43,10 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ---
 ---
+
+### Releases v1.0.1
+
+1. Add complicated example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) utilizing and demonstrating the full usage of 16 independent ISR Timers.
 
 ### Releases v1.0.0
 
@@ -67,7 +73,9 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
    - [`UIPEthernet library v2.0.9+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60.
  5. [`WiFiNINA_Generic library v1.7.1+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
  6. [`Blynk_WiFiNINA_WM library 1.0.4+`](hhttps://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
- 
+ 7. To use with certain example
+   - [`SimpleTimer library`](https://github.com/schinken/SimpleTimer) for [ISR_16_Timers_Array example](examples/ISR_16_Timers_Array).
+   
 ---
 ---
 
@@ -207,7 +215,7 @@ To re-use the **new h-only** way, just
 Now with these new `16 ISR-based timers` (while consuming only **1 hardware timer**), the maximum interval is practically unlimited (limited only by unsigned long miliseconds). The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers Therefore, their executions are not blocked by bad-behaving functions / tasks.
 This important feature is absolutely necessary for mission-critical tasks. 
 
-The [**ISR_Timer_Complex_Ethernet**](examples/ISR_Timer_Complex_Ethernet) and [**ISR_Timer_Complex_WiFiNINA**](examples/ISR_Timer_Complex_WiFiNINA) examples will demonstrate the nearly perfect accuracy compared to software timers by printing the actual elapsed millisecs of each type of timers.
+The [**ISR_16_Timers_Array**](examples/ISR_16_Timers_Array), [**ISR_Timer_Complex_Ethernet**](examples/ISR_Timer_Complex_Ethernet) and [**ISR_Timer_Complex_WiFiNINA**](examples/ISR_Timer_Complex_WiFiNINA) examples will demonstrate the nearly perfect accuracy compared to software timers by printing the actual elapsed millisecs of each type of timers.
 Being ISR-based timers, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet and Blynk services. You can also have many `(up to 16)` timers to use.
 This non-being-blocked important feature is absolutely necessary for mission-critical tasks. 
 You'll see blynkTimer Software is blocked while system is connecting to WiFi / Internet / Blynk, as well as by blocking task 
@@ -341,13 +349,14 @@ void setup()
 ### Examples: 
 
  1. [Argument_None](examples/Argument_None)
- 2. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
- 3. [ISR_Timer_Complex_Ethernet](examples/ISR_Timer_Complex_Ethernet)
- 4. [ISR_Timer_Complex_WiFiNINA](examples/ISR_Timer_Complex_WiFiNINA)
- 5. [RPM_Measure](examples/RPM_Measure)
- 6. [SwitchDebounce](examples/SwitchDebounce)
- 7. [TimerInterruptTest](examples/TimerInterruptTest)
- 8. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
+ 2. [ISR_16_Timers_Array](examples/ISR_16_Timers_Array)
+ 3. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
+ 4. [ISR_Timer_Complex_Ethernet](examples/ISR_Timer_Complex_Ethernet)
+ 5. [ISR_Timer_Complex_WiFiNINA](examples/ISR_Timer_Complex_WiFiNINA)
+ 6. [RPM_Measure](examples/RPM_Measure)
+ 7. [SwitchDebounce](examples/SwitchDebounce)
+ 8. [TimerInterruptTest](examples/TimerInterruptTest)
+ 9. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
 
 
 ---
@@ -832,8 +841,61 @@ ITimer0: millis() = 31950, delta = 1000
 ITimer0: millis() = 32950, delta = 1000
 
 ```
+
+4. The following is the sample terminal output when running example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) on **Adafruit NRF52840_ITSYBITSY** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy or blocked**. The 16 independent ISR timers are **programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!**
+
+While software timer, **programmed for 2s, is activated after 10.000s in loop()!!!**.
+
+In this example, 16 independent ISR Timers are used, yet utilized just one Hardware Timer. The Timer Intervals and Function Pointers are stored in arrays to facilitate the code modification.
+
+
+```
+Starting ISR_16_Timers_Array on NRF52840_ITSYBITSY
+Version : 1.0.1
+CPU Frequency = 64 MHz
+NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
+NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000
+Starting  ITimer OK, millis() = 915
+5s: Delta ms = 5000, ms = 5915
+simpleTimer2s:Dms=10001
+5s: Delta ms = 5001, ms = 10916
+5s: Delta ms = 4999, ms = 15915
+5s: Delta ms = 5000, ms = 20915
+simpleTimer2s:Dms=10003
+5s: Delta ms = 5000, ms = 25915
+5s: Delta ms = 5000, ms = 30915
+simpleTimer2s:Dms=10000
+5s: Delta ms = 5000, ms = 35915
+5s: Delta ms = 5000, ms = 40915
+simpleTimer2s:Dms=10000
+5s: Delta ms = 5000, ms = 45915
+5s: Delta ms = 5000, ms = 50915
+simpleTimer2s:Dms=10004
+5s: Delta ms = 5000, ms = 55915
+5s: Delta ms = 5000, ms = 60915
+simpleTimer2s:Dms=10001
+5s: Delta ms = 5000, ms = 65915
+5s: Delta ms = 5000, ms = 70915
+simpleTimer2s:Dms=10005
+5s: Delta ms = 5000, ms = 75915
+5s: Delta ms = 5000, ms = 80915
+simpleTimer2s:Dms=10004
+5s: Delta ms = 5000, ms = 85915
+5s: Delta ms = 5000, ms = 90915
+simpleTimer2s:Dms=10000
+5s: Delta ms = 5001, ms = 95916
+5s: Delta ms = 4999, ms = 100915
+simpleTimer2s:Dms=10004
+5s: Delta ms = 5000, ms = 105915
+5s: Delta ms = 5000, ms = 110915
+simpleTimer2s:Dms=10004
+```
 ---
 ---
+
+### Releases v1.0.1
+
+1. Add complicated example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) utilizing and demonstrating the full usage of 16 independent ISR Timers.
 
 ### Releases v1.0.0
 
@@ -860,8 +922,6 @@ Submit issues to: [NRF52_TimerInterrupt issues](https://github.com/khoih-prog/NR
 
 ## DONE
 
-For current version v1.0.0
-
 1. Basic hardware timers for NRF52832 and NRF52840.
 2. More hardware-initiated software-enabled timers
 3. Longer time interval
@@ -873,6 +933,13 @@ For current version v1.0.0
 
 Many thanks for everyone for bug reporting, new feature suggesting, testing and contributing to the development of this library.
 
+1. Thanks to good work of [Miguel Wisintainer](https://github.com/tcpipchip) for working with, developing, debugging and testing.
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/tcpipchip"><img src="https://github.com/tcpipchip.png" width="100px;" alt="tcpipchip"/><br /><sub><b> Miguel Wisintainer</b></sub></a><br /></td>
+  </tr> 
+</table>
 
 ---
 
