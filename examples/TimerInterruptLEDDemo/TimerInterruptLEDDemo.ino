@@ -19,12 +19,13 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
 
-   Version: 1.0.1
+   Version: 1.0.2
 
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
    1.0.0   K Hoang      02/11/2020 Initial coding
    1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
 *****************************************************************************************************************************/
 
 /*
@@ -92,18 +93,15 @@ void TimerHandler(void)
 void doingSomething1()
 {
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  Serial.println("G");
 }
 
 void doingSomething2()
 {
   digitalWrite(LED_BLUE, !digitalRead(LED_BLUE));
-  Serial.println("B");
 }
 void doingSomething3()
 {
   digitalWrite(LED_RED, !digitalRead(LED_RED));
-  Serial.println("R");
 }
 
 void setup()
@@ -111,11 +109,9 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
-  Serial.println("\nTimerInterruptLEDDemo on " + String(BOARD_NAME));
+  Serial.printf("\nStarting TimerInterruptLEDDemo on %s\n", BOARD_NAME);
+  Serial.printf("Version : v%s\n", NRF52_TIMER_INTERRUPT_VERSION);
   Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
-
-  // Instantiate HardwareTimer object. Thanks to 'new' instanciation, HardwareTimer is not destructed when setup() function is finished.
-  //HardwareTimer *MyTim = new HardwareTimer(Instance);
 
   // configure pin in output mode
   pinMode(LED_BUILTIN,  OUTPUT);
@@ -125,7 +121,7 @@ void setup()
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
+    Serial.printf("Starting  ITimer OK, millis() = %ld\n", millis());
   }
   else
     Serial.println("Can't set ITimer correctly. Select another freq. or interval");

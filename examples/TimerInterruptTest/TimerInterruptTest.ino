@@ -19,12 +19,13 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
 
-   Version: 1.0.1
+   Version: 1.0.2
 
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
    1.0.0   K Hoang      02/11/2020 Initial coding
    1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
 *****************************************************************************************************************************/
 /*
    Notes:
@@ -55,8 +56,8 @@
 //  #define LED_BUILTIN         3
 //#endif
 
-#ifndef LED_BLUE_PIN
-  #define LED_BLUE_PIN          7
+#ifndef LED_BLUE
+  #define LED_BLUE              7
 #endif
 
 #ifndef LED_RED
@@ -74,6 +75,9 @@ unsigned int SWPin = 11;
 volatile uint32_t preMillisTimer0 = 0;
 volatile uint32_t preMillisTimer1 = 0;
 
+static bool toggle0 = false;
+static bool toggle1 = false;
+
 // Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
 // If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
 
@@ -81,58 +85,20 @@ volatile uint32_t preMillisTimer1 = 0;
 NRF52Timer ITimer0(NRF_TIMER_1);
 
 void TimerHandler0(void)
-{
-  static bool toggle0 = false;
-  static bool started = false;
-  static uint32_t curMillis = 0;
-
-  if (!started)
-  {
-    started = true;
-    pinMode(LED_BUILTIN, OUTPUT);
-  }
- 
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
-    curMillis = millis();
-    
-    if (curMillis > TIMER0_INTERVAL_MS)
-    {
-      Serial.println("ITimer0: millis() = " + String(curMillis) + ", delta = " + String(curMillis - preMillisTimer0));
-    }
-    
-    preMillisTimer0 = curMillis;
-#endif
+{  
+  preMillisTimer0 = millis();
 
   //timer interrupt toggles pin LED_BUILTIN
   digitalWrite(LED_BUILTIN, toggle0);
   toggle0 = !toggle0;
 }
 
-// Init NRF52 timer NRF_TIMER2
-NRF52Timer ITimer1(NRF_TIMER_2);
+// Init NRF52 timer NRF_TIMER4
+NRF52Timer ITimer1(NRF_TIMER_4);
 
 void TimerHandler1(void)
 {
-  static bool toggle1 = false;
-  static bool started = false;
-  static uint32_t curMillis = 0;
-
-  if (!started)
-  {
-    started = true;
-    pinMode(LED_BLUE, OUTPUT);
-  }
-  
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
-    curMillis = millis();
-
-    if (curMillis > TIMER1_INTERVAL_MS)
-    {
-      Serial.println("ITimer1: millis() = " + String(curMillis) + ", delta = " + String(curMillis - preMillisTimer1));
-    }
-    
-    preMillisTimer1 = curMillis;
-#endif
+  preMillisTimer1 = millis();
 
   //timer interrupt toggles outputPin
   digitalWrite(LED_BLUE, toggle1);
@@ -141,19 +107,23 @@ void TimerHandler1(void)
 
 void setup()
 {
+  pinMode(LED_BUILTIN,  OUTPUT);
+  pinMode(LED_BLUE,     OUTPUT);
+  
   Serial.begin(115200);
   while (!Serial);
   
   delay(100);
   
-  Serial.println("\nStarting TimerInterruptTest on " + String(BOARD_NAME));
-  Serial.println("Version : " + String(NRF52_TIMER_INTERRUPT_VERSION));
+  Serial.printf("\nStarting TimerInterruptTest on %s\n", BOARD_NAME);
+  Serial.printf("Version : v%s\n", NRF52_TIMER_INTERRUPT_VERSION);
+  Serial.printf("CPU Frequency = %ld MHz\n", F_CPU / 1000000);
 
   // Interval in microsecs
   if (ITimer0.attachInterruptInterval(TIMER0_INTERVAL_MS * 1000, TimerHandler0))
   {
     preMillisTimer0 = millis();
-    Serial.println("Starting  ITimer1 OK, millis() = " + String(preMillisTimer0));
+    Serial.printf("Starting  ITimer0 OK, millis() = %ld\n", preMillisTimer0);
   }
   else
     Serial.println("Can't set ITimer0. Select another freq. or timer");
@@ -162,7 +132,7 @@ void setup()
   if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler1))
   {
     preMillisTimer1 = millis();
-    Serial.println("Starting  ITimer1 OK, millis() = " + String(preMillisTimer1));
+    Serial.printf("Starting  ITimer1 OK, millis() = %ld\n", preMillisTimer1);
   }
   else
     Serial.println("Can't set ITimer1. Select another freq. or timer");

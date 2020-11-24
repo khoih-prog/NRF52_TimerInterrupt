@@ -19,12 +19,13 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
 
-   Version: 1.0.1
+   Version: 1.0.2
 
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
    1.0.0   K Hoang      02/11/2020 Initial coding
    1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
 *****************************************************************************************************************************/
 /*
    Notes:
@@ -71,11 +72,9 @@
 
 unsigned int SWPin = 11;
 
-#define TIMER1_INTERVAL_MS        20
+#define TIMER_INTERVAL_MS         10
 #define DEBOUNCING_INTERVAL_MS    100
 #define LONG_PRESS_INTERVAL_MS    5000
-
-#define LOCAL_DEBUG               1
 
 // Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
 // If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
@@ -86,58 +85,42 @@ NRF52Timer ITimer(NRF_TIMER_1);
 volatile bool SWPressed     = false;
 volatile bool SWLongPressed = false;
 
+unsigned int debounceCountSWPressed  = 0;
+unsigned int debounceCountSWReleased = 0;
+bool toggle0 = false;
+bool toggle1 = false;
+  
 void TimerHandler(void)
 {
-  static unsigned int debounceCountSWPressed  = 0;
-  static unsigned int debounceCountSWReleased = 0;
-
-  static unsigned long SWPressedTime;
-  static unsigned long SWReleasedTime;
-
-  static bool started = false;
-
-  if (!started)
-  {
-    started = true;
-    pinMode(SWPin, INPUT_PULLUP);
-  }
-
   if ( (!digitalRead(SWPin)) )
   {
     // Start debouncing counting debounceCountSWPressed and clear debounceCountSWReleased
     debounceCountSWReleased = 0;
 
-    if (++debounceCountSWPressed >= DEBOUNCING_INTERVAL_MS / TIMER1_INTERVAL_MS)
+    if (++debounceCountSWPressed >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS)
     {
       // Call and flag SWPressed
       if (!SWPressed)
       {
-        SWPressedTime = millis();
-
-#if (LOCAL_DEBUG > 0)
-        Serial.println("SW Press, from millis() = " + String(SWPressedTime - DEBOUNCING_INTERVAL_MS));
-#endif
-
         SWPressed = true;
         // Do something for SWPressed here in ISR
         // But it's better to use outside software timer to do your job instead of inside ISR
         //Your_Response_To_Press();
+        digitalWrite(LED_BUILTIN, toggle0);
+        toggle0 = !toggle0;
       }
 
-      if (debounceCountSWPressed >= LONG_PRESS_INTERVAL_MS / TIMER1_INTERVAL_MS)
+      if (debounceCountSWPressed >= LONG_PRESS_INTERVAL_MS / TIMER_INTERVAL_MS)
       {
         // Call and flag SWLongPressed
         if (!SWLongPressed)
         {
-#if (LOCAL_DEBUG > 0)
-          Serial.println("SW Long Pressed, total time ms = " + String(millis()) + " - " + String(SWPressedTime - DEBOUNCING_INTERVAL_MS)
-                         + " = " + String(millis() - SWPressedTime + DEBOUNCING_INTERVAL_MS) );
-#endif
-
           SWLongPressed = true;
           // Do something for SWLongPressed here in ISR
           // But it's better to use outside software timer to do your job instead of inside ISR
           //Your_Response_To_Long_Press();
+          digitalWrite(LED_BLUE, toggle1);
+          toggle1 = !toggle1;
         }
       }
     }
@@ -145,14 +128,9 @@ void TimerHandler(void)
   else
   {
     // Start debouncing counting debounceCountSWReleased and clear debounceCountSWPressed
-    if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER1_INTERVAL_MS))
+    if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS))
     {
-      SWReleasedTime = millis();
-
       // Call and flag SWPressed
-#if (LOCAL_DEBUG > 0)
-      Serial.println("SW Released, from millis() = " + String(SWReleasedTime));
-#endif
 
       SWPressed     = false;
       SWLongPressed = false;
@@ -162,10 +140,6 @@ void TimerHandler(void)
       //Your_Response_To_Release();
 
       // Call and flag SWPressed
-#if (LOCAL_DEBUG > 0)
-      Serial.println("SW Pressed total time ms = " + String(SWReleasedTime - SWPressedTime));
-#endif
-
       debounceCountSWPressed = 0;
     }
   }
@@ -173,22 +147,43 @@ void TimerHandler(void)
 
 void setup()
 {
+  pinMode(SWPin, INPUT_PULLUP);
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BLUE,    OUTPUT);
+
   Serial.begin(115200);
   while (!Serial);
 
   delay(100);
-  
-  Serial.println("\nStarting SwitchDebounce on " + String(BOARD_NAME));
-  Serial.println("Version : " + String(NRF52_TIMER_INTERRUPT_VERSION));
 
+  Serial.printf("\nStarting SwitchDebounce on %s\n", BOARD_NAME);
+  Serial.printf("Version : v%s\n", NRF52_TIMER_INTERRUPT_VERSION);
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
+ 
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler))
-    Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
+    Serial.printf("Starting  ITimer OK, millis() = %ld\n", millis());
   else
     Serial.println("Can't set ITimer. Select another freq., duration or timer");
 }
 
+void printResult(uint32_t currTime)
+{
+  Serial.printf("Time = %ld, Switch = %s\n", currTime, SWLongPressed? "LongPressed" : (SWPressed? "Pressed" : "Released") );
+}
+
+#define CHECK_INTERVAL_MS     1000L
+
 void loop()
 {
+  static uint32_t lastTime = 0;
+  static uint32_t currTime;
 
+  currTime = millis();
+
+  if (currTime - lastTime > CHECK_INTERVAL_MS)
+  {
+    printResult(currTime);
+    lastTime = currTime;
+  }
 }
