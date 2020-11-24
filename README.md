@@ -44,6 +44,11 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
+### Releases v1.0.2
+
+1. Add complicated example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
+2. Optimize examples
+
 ### Releases v1.0.1
 
 1. Add complicated example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) utilizing and demonstrating the full usage of 16 independent ISR Timers.
@@ -350,13 +355,14 @@ void setup()
 
  1. [Argument_None](examples/Argument_None)
  2. [ISR_16_Timers_Array](examples/ISR_16_Timers_Array)
- 3. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
- 4. [ISR_Timer_Complex_Ethernet](examples/ISR_Timer_Complex_Ethernet)
- 5. [ISR_Timer_Complex_WiFiNINA](examples/ISR_Timer_Complex_WiFiNINA)
- 6. [RPM_Measure](examples/RPM_Measure)
- 7. [SwitchDebounce](examples/SwitchDebounce)
- 8. [TimerInterruptTest](examples/TimerInterruptTest)
- 9. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
+ 3. [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
+ 4. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
+ 5. [ISR_Timer_Complex_Ethernet](examples/ISR_Timer_Complex_Ethernet)
+ 6. [ISR_Timer_Complex_WiFiNINA](examples/ISR_Timer_Complex_WiFiNINA)
+ 7. [RPM_Measure](examples/RPM_Measure)
+ 8. [SwitchDebounce](examples/SwitchDebounce)
+ 9. [TimerInterruptTest](examples/TimerInterruptTest)
+10. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
 
 
 ---
@@ -419,6 +425,7 @@ void setup()
 #endif
 
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
+// Don't define NRF52_TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
 #define NRF52_TIMER_INTERRUPT_DEBUG      1
 
 #include "NRF52TimerInterrupt.h"
@@ -482,18 +489,19 @@ void TimerHandler(void)
 // Or you can get this run-time error / crash
 void doingSomething2s()
 {
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 2)  
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
+
   if (previousMillis > TIMER_INTERVAL_2S)
   {
     Serial.print("2s: Delta ms = ");
     Serial.println(deltaMillis);
   }
-#endif
 
   previousMillis = millis();
+#endif  
 }
 
 // In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
@@ -501,18 +509,19 @@ void doingSomething2s()
 // Or you can get this run-time error / crash
 void doingSomething5s()
 {
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 2)  
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   if (previousMillis > TIMER_INTERVAL_5S)
   {
     Serial.print("5s: Delta ms = ");
     Serial.println(deltaMillis);
   }
-#endif
 
   previousMillis = millis();
+  
+#endif  
 }
 
 // In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
@@ -520,18 +529,18 @@ void doingSomething5s()
 // Or you can get this run-time error / crash
 void doingSomething11s()
 {
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 2)  
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   if (previousMillis > TIMER_INTERVAL_11S)
   {
     Serial.print("11s: Delta ms = ");
     Serial.println(deltaMillis);
   }
-#endif
 
   previousMillis = millis();
+#endif  
 }
 
 // In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
@@ -539,18 +548,18 @@ void doingSomething11s()
 // Or you can get this run-time error / crash
 void doingSomething21s()
 {
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 2)  
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   if (previousMillis > TIMER_INTERVAL_21S)
   {
     Serial.print("21s: Delta ms = ");
     Serial.println(deltaMillis);
   }
-#endif
 
   previousMillis = millis();
+#endif  
 }
 
 #define BLYNK_TIMER_MS        2000L
@@ -571,8 +580,9 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
   
-  Serial.println("\nStarting ISR_Timer_Complex_Ethernet on " + String(BOARD_NAME));
-  Serial.println("Version : " + String(NRF52_TIMER_INTERRUPT_VERSION));
+  Serial.printf("\nStarting ISR_Timer_Complex_Ethernet on %s\n", BOARD_NAME);
+  Serial.printf("Version : v%s\n", NRF52_TIMER_INTERRUPT_VERSION);
+  Serial.printf("CPU Frequency = %ld MHz\n", F_CPU / 1000000);
 
   // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
   blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);
@@ -641,7 +651,8 @@ While software timer, **programmed for 2s, is activated after 4.867s !!!**. Then
 
 ```
 Starting ISR_Timer_Complex_Ethernet on NRF52840_FEATHER
-Version : 1.0.0
+Version : v1.0.2
+CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 50000
 Starting  ITimer OK, millis() = 1419
@@ -724,125 +735,69 @@ blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000
 
 ---
 
-2. The following is the sample terminal output when running example [**TimerInterruptTest**](examples/TimerInterruptTest) on **Adafruit NRF52840_ITSYBITSY** to demonstrate the accuracy and how to start/stop Hardware Timers.
+2. The following is the sample terminal output when running example [**TimerInterruptTest**](examples/TimerInterruptTest) on **Adafruit NRF52840_FEATHER** to demonstrate the accuracy and how to start/stop Hardware Timers.
 
 ```
-Starting TimerInterruptTest on NRF52840_ITSYBITSY
-Version : 1.0.0
+Starting TimerInterruptTest on NRF52840_FEATHER
+Version : v1.0.2
+CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
-Starting  ITimer1 OK, millis() = 834
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
+Starting  ITimer0 OK, millis() = 1406
+NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER4
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 3000000
-Starting  ITimer1 OK, millis() = 835
-ITimer0: millis() = 1834, delta = 1000
-ITimer0: millis() = 2834, delta = 1000
-ITimer0: millis() = 3834, delta = 1000
-ITimer1: millis() = 3835, delta = 3000
-ITimer0: millis() = 4834, delta = 1000
+Starting  ITimer1 OK, millis() = 1407
 Stop ITimer0, millis() = 5001
-ITimer1: millis() = 6835, delta = 3000
-ITimer1: millis() = 9835, delta = 3000
 Start ITimer0, millis() = 10002
-ITimer0: millis() = 11002, delta = 1000
-ITimer0: millis() = 12002, delta = 1000
-ITimer1: millis() = 12835, delta = 3000
-ITimer0: millis() = 13002, delta = 1000
-ITimer0: millis() = 14002, delta = 1000
 Stop ITimer1, millis() = 15001
-ITimer0: millis() = 15002, delta = 1000
 Stop ITimer0, millis() = 15003
 Start ITimer0, millis() = 20004
-ITimer0: millis() = 21004, delta = 1000
-ITimer0: millis() = 22004, delta = 1000
-ITimer0: millis() = 23004, delta = 1000
-ITimer0: millis() = 24004, delta = 1000
-ITimer0: millis() = 25004, delta = 1000
 Stop ITimer0, millis() = 25005
 Start ITimer1, millis() = 30002
 Start ITimer0, millis() = 30006
-ITimer0: millis() = 31006, delta = 1000
-ITimer0: millis() = 32006, delta = 1000
-ITimer1: millis() = 33002, delta = 3000
-ITimer0: millis() = 33006, delta = 1000
-ITimer0: millis() = 34006, delta = 1000
-ITimer0: millis() = 35006, delta = 1000
 Stop ITimer0, millis() = 35007
-ITimer1: millis() = 36002, delta = 3000
-ITimer1: millis() = 39002, delta = 3000
 Start ITimer0, millis() = 40008
-ITimer0: millis() = 41008, delta = 1000
-ITimer1: millis() = 42002, delta = 3000
-ITimer0: millis() = 42008, delta = 1000
-ITimer0: millis() = 43008, delta = 1000
-ITimer0: millis() = 44008, delta = 1000
-ITimer1: millis() = 45002, delta = 3000
 Stop ITimer1, millis() = 45003
-ITimer0: millis() = 45008, delta = 1000
 Stop ITimer0, millis() = 45009
 Start ITimer0, millis() = 50010
-ITimer0: millis() = 51010, delta = 1000
-ITimer0: millis() = 52010, delta = 1000
-ITimer0: millis() = 53010, delta = 1000
-ITimer0: millis() = 54010, delta = 1000
-ITimer0: millis() = 55010, delta = 1000
+Stop ITimer0, millis() = 55011
+Start ITimer1, millis() = 60004
+Start ITimer0, millis() = 60012
+Stop ITimer0, millis() = 65013
+Start ITimer0, millis() = 70014
+Stop ITimer1, millis() = 75005
+Stop ITimer0, millis() = 75015
+Start ITimer0, millis() = 80016
+Stop ITimer0, millis() = 85017
 ```
 
 ---
 
-3. The following is the sample terminal output when running example [**Argument_None**](examples/Argument_None) on **Adafruit NRF52840_ITSYBITSY** to demonstrate the accuracy of Hardware Timers.
+3. The following is the sample terminal output when running example [**Argument_None**](examples/Argument_None) on **Adafruit NRF52840_FEATHER** to demonstrate the accuracy of Hardware Timers.
 
 ```
-Starting Argument_None on NRF52840_ITSYBITSY
-Version : 1.0.0
+Starting Argument_None on NRF52840_FEATHER
+Version : v1.0.2
+CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
-Starting  ITimer0 OK, millis() = 948
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER4
+Starting  ITimer0 OK, millis() = 1505
+NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 5000000
-Starting  ITimer1 OK, millis() = 949
-ITimer0: millis() = 1948, delta = 1000
-ITimer0: millis() = 2948, delta = 1000
-ITimer0: millis() = 3948, delta = 1000
-ITimer0: millis() = 4948, delta = 1000
-ITimer0: millis() = 5948, delta = 1000
-ITimer1: millis() = 5949, delta = 5000
-ITimer0: millis() = 6948, delta = 1000
-ITimer0: millis() = 7948, delta = 1000
-ITimer0: millis() = 8949, delta = 1001
-ITimer0: millis() = 9949, delta = 1000
-ITimer0: millis() = 10949, delta = 1000
-ITimer1: millis() = 10949, delta = 5000
-ITimer0: millis() = 11949, delta = 1000
-ITimer0: millis() = 12949, delta = 1000
-ITimer0: millis() = 13949, delta = 1000
-ITimer0: millis() = 14949, delta = 1000
-ITimer1: millis() = 15949, delta = 5000
-ITimer0: millis() = 15949, delta = 1000
-ITimer0: millis() = 16949, delta = 1000
-ITimer0: millis() = 17949, delta = 1000
-ITimer0: millis() = 18949, delta = 1000
-ITimer0: millis() = 19949, delta = 1000
-ITimer1: millis() = 20949, delta = 5000
-ITimer0: millis() = 20949, delta = 1000
-ITimer0: millis() = 21950, delta = 1001
-ITimer0: millis() = 22950, delta = 1000
-ITimer0: millis() = 23950, delta = 1000
-ITimer0: millis() = 24950, delta = 1000
-ITimer1: millis() = 25949, delta = 5000
-ITimer0: millis() = 25950, delta = 1000
-ITimer0: millis() = 26950, delta = 1000
-ITimer0: millis() = 27950, delta = 1000
-ITimer0: millis() = 28950, delta = 1000
-ITimer0: millis() = 29950, delta = 1000
-ITimer1: millis() = 30949, delta = 5000
-ITimer0: millis() = 30950, delta = 1000
-ITimer0: millis() = 31950, delta = 1000
-ITimer0: millis() = 32950, delta = 1000
+Starting  ITimer1 OK, millis() = 1506
+Time = 10001, Timer0Count = 8, , Timer1Count = 1
+Time = 20002, Timer0Count = 18, , Timer1Count = 3
+Time = 30003, Timer0Count = 28, , Timer1Count = 5
+Time = 40004, Timer0Count = 38, , Timer1Count = 7
+Time = 50005, Timer0Count = 48, , Timer1Count = 9
+Time = 60006, Timer0Count = 58, , Timer1Count = 11
+Time = 70007, Timer0Count = 68, , Timer1Count = 13
+Time = 80008, Timer0Count = 78, , Timer1Count = 15
+Time = 90009, Timer0Count = 88, , Timer1Count = 17
 
 ```
 
-4. The following is the sample terminal output when running example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) on **Adafruit NRF52840_ITSYBITSY** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy or blocked**. The 16 independent ISR timers are **programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!**
+4. The following is the sample terminal output when running new example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) on **Adafruit NRF52840_FEATHER** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy or blocked**. The 16 independent ISR timers are **programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!**
 
 While software timer, **programmed for 2s, is activated after 10.000s in loop()!!!**.
 
@@ -850,48 +805,190 @@ In this example, 16 independent ISR Timers are used, yet utilized just one Hardw
 
 
 ```
-Starting ISR_16_Timers_Array on NRF52840_ITSYBITSY
-Version : 1.0.1
+Starting ISR_16_Timers_Array_Complex on NRF52840_FEATHER
+Version : 1.0.2
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000
-Starting  ITimer OK, millis() = 915
-5s: Delta ms = 5000, ms = 5915
-simpleTimer2s:Dms=10001
-5s: Delta ms = 5001, ms = 10916
-5s: Delta ms = 4999, ms = 15915
-5s: Delta ms = 5000, ms = 20915
-simpleTimer2s:Dms=10003
-5s: Delta ms = 5000, ms = 25915
-5s: Delta ms = 5000, ms = 30915
-simpleTimer2s:Dms=10000
-5s: Delta ms = 5000, ms = 35915
-5s: Delta ms = 5000, ms = 40915
-simpleTimer2s:Dms=10000
-5s: Delta ms = 5000, ms = 45915
-5s: Delta ms = 5000, ms = 50915
-simpleTimer2s:Dms=10004
-5s: Delta ms = 5000, ms = 55915
-5s: Delta ms = 5000, ms = 60915
-simpleTimer2s:Dms=10001
-5s: Delta ms = 5000, ms = 65915
-5s: Delta ms = 5000, ms = 70915
-simpleTimer2s:Dms=10005
-5s: Delta ms = 5000, ms = 75915
-5s: Delta ms = 5000, ms = 80915
-simpleTimer2s:Dms=10004
-5s: Delta ms = 5000, ms = 85915
-5s: Delta ms = 5000, ms = 90915
-simpleTimer2s:Dms=10000
-5s: Delta ms = 5001, ms = 95916
-5s: Delta ms = 4999, ms = 100915
-simpleTimer2s:Dms=10004
-5s: Delta ms = 5000, ms = 105915
-5s: Delta ms = 5000, ms = 110915
-simpleTimer2s:Dms=10004
+NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
+Starting  ITimer OK, millis() = 1409
+SimpleTimer : 2s, ms = 11409, Dms : 10000
+Timer : 0, programmed : 5000, actual : 5005
+Timer : 1, programmed : 10000, actual : 0
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 21415, Dms : 10006
+Timer : 0, programmed : 5000, actual : 4992
+Timer : 1, programmed : 10000, actual : 9993
+Timer : 2, programmed : 15000, actual : 15008
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 31416, Dms : 10001
+Timer : 0, programmed : 5000, actual : 4994
+Timer : 1, programmed : 10000, actual : 10001
+Timer : 2, programmed : 15000, actual : 14993
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25007
+Timer : 5, programmed : 30000, actual : 30001
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 41417, Dms : 10001
+Timer : 0, programmed : 5000, actual : 4994
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 14993
+Timer : 3, programmed : 20000, actual : 20001
+Timer : 4, programmed : 25000, actual : 25007
+Timer : 5, programmed : 30000, actual : 30001
+Timer : 6, programmed : 35000, actual : 35007
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 51438, Dms : 10021
+Timer : 0, programmed : 5000, actual : 5005
+Timer : 1, programmed : 10000, actual : 10006
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20001
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30001
+Timer : 6, programmed : 35000, actual : 35007
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 45002
+Timer : 9, programmed : 50000, actual : 50007
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 61440, Dms : 10002
+Timer : 0, programmed : 5000, actual : 4998
+Timer : 1, programmed : 10000, actual : 9996
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20002
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30002
+Timer : 6, programmed : 35000, actual : 35007
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 45002
+Timer : 9, programmed : 50000, actual : 50007
+Timer : 10, programmed : 55000, actual : 55005
+Timer : 11, programmed : 60000, actual : 60003
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 71444, Dms : 10004
+Timer : 0, programmed : 5000, actual : 4994
+Timer : 1, programmed : 10000, actual : 9998
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20002
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30002
+Timer : 6, programmed : 35000, actual : 34994
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 45002
+Timer : 9, programmed : 50000, actual : 50007
+Timer : 10, programmed : 55000, actual : 55005
+Timer : 11, programmed : 60000, actual : 60003
+Timer : 12, programmed : 65000, actual : 65007
+Timer : 13, programmed : 70000, actual : 70001
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2s, ms = 81448, Dms : 10004
+Timer : 0, programmed : 5000, actual : 4993
+Timer : 1, programmed : 10000, actual : 9999
+Timer : 2, programmed : 15000, actual : 15004
+Timer : 3, programmed : 20000, actual : 19997
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30002
+Timer : 6, programmed : 35000, actual : 34994
+Timer : 7, programmed : 40000, actual : 39999
+Timer : 8, programmed : 45000, actual : 45002
+Timer : 9, programmed : 50000, actual : 50007
+Timer : 10, programmed : 55000, actual : 55005
+Timer : 11, programmed : 60000, actual : 60003
+Timer : 12, programmed : 65000, actual : 65007
+Timer : 13, programmed : 70000, actual : 70001
+Timer : 14, programmed : 75000, actual : 75007
+Timer : 15, programmed : 80000, actual : 80000
+```
+
+---
+
+5. The following is the sample terminal output when running example [**SwitchDebounce**](examples/SwitchDebounce) on **Adafruit NRF52840_FEATHER** to demonstrate the usage of Hardware Timers for Switch Debouncing.
+
+```
+Starting SwitchDebounce on NRF52840_FEATHER
+Version : v1.0.2
+CPU Frequency = 64 MHz
+NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
+NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
+Starting  ITimer OK, millis() = 1560
+Time = 1560, Switch = Released
+Time = 2561, Switch = Released
+Time = 3562, Switch = Released
+Time = 4563, Switch = Released
+...
+Time = 73632, Switch = Released
+Time = 74633, Switch = Released
+Time = 75634, Switch = Released
+Time = 76635, Switch = Released
+Time = 77636, Switch = Pressed
+Time = 78637, Switch = Pressed
+Time = 79638, Switch = Pressed
+Time = 80639, Switch = Pressed
+Time = 81640, Switch = Pressed
+Time = 82641, Switch = LongPressed
+Time = 83642, Switch = LongPressed
+Time = 84643, Switch = LongPressed
+Time = 85644, Switch = Released
+Time = 86645, Switch = Released
+Time = 87646, Switch = Released
+
 ```
 ---
 ---
+
+### Releases v1.0.2
+
+1. Add complicated example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
+2. Optimize examples
 
 ### Releases v1.0.1
 
