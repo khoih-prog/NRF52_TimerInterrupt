@@ -44,6 +44,11 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
+### Releases v1.1.1
+
+1. Add example [**Change_Interval**](examples/Change_Interval) and [**FakeAnalogWrite**](examples/FakeAnalogWrite)
+2. Bump up version to sync with other TimerInterrupt Libraries. Modify Version String.
+
 ### Releases v1.0.2
 
 1. Add complicated example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
@@ -65,7 +70,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
-## Prerequisite
+## Prerequisites
 
  1. [`Arduino IDE 1.8.13+` for Arduino](https://www.arduino.cc/en/Main/Software)
  2. [`Adafruit nRF52 v0.21.0+`](https://www.adafruit.com/) for nRF52 boards such as AdaFruit Feather nRF52840 Express, NINA_B302_ublox, etc.
@@ -104,7 +109,7 @@ Another way to install is to:
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**NRF52_TimerInterrupt** library](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**NRF52_TimerInterrupt** library](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt) or [**NRF52_TimerInterrupt** library](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/11427/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
@@ -365,7 +370,8 @@ void setup()
  8. [SwitchDebounce](examples/SwitchDebounce)
  9. [TimerInterruptTest](examples/TimerInterruptTest)
 10. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
-
+11. [**FakeAnalogWrite**](examples/FakeAnalogWrite). New.
+12. [**Change_Interval**](examples/Change_Interval). New.
 
 ---
 ---
@@ -583,8 +589,8 @@ void setup()
   while (!Serial);
   
   Serial.printf("\nStarting ISR_Timer_Complex_Ethernet on %s\n", BOARD_NAME);
-  Serial.printf("Version : v%s\n", NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.printf("CPU Frequency = %ld MHz\n", F_CPU / 1000000);
+  Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
 
   // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
   blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);
@@ -653,7 +659,7 @@ While software timer, **programmed for 2s, is activated after 4.867s !!!**. Then
 
 ```
 Starting ISR_Timer_Complex_Ethernet on NRF52840_FEATHER
-Version : v1.0.2
+NRF52TimerInterrupt v1.1.1
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 50000
@@ -741,7 +747,7 @@ blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000
 
 ```
 Starting TimerInterruptTest on NRF52840_FEATHER
-Version : v1.0.2
+NRF52TimerInterrupt v1.1.1
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
@@ -779,7 +785,7 @@ Stop ITimer0, millis() = 85017
 
 ```
 Starting Argument_None on NRF52840_FEATHER
-Version : v1.0.2
+NRF52TimerInterrupt v1.1.1
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
@@ -808,7 +814,7 @@ In this example, 16 independent ISR Timers are used, yet utilized just one Hardw
 
 ```
 Starting ISR_16_Timers_Array_Complex on NRF52840_FEATHER
-Version : 1.0.2
+NRF52TimerInterrupt v1.1.1
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
@@ -957,7 +963,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting SwitchDebounce on NRF52840_FEATHER
-Version : v1.0.2
+NRF52TimerInterrupt v1.1.1
 CPU Frequency = 64 MHz
 NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
 NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
@@ -984,8 +990,136 @@ Time = 86645, Switch = Released
 Time = 87646, Switch = Released
 
 ```
+
+---
+
+6. The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) to demonstrate how to change Timer Interval on-the-fly
+
+```
+Starting Change_Interval on NRF52840_FEATHER
+NRF52TimerInterrupt v1.1.1
+CPU Frequency = 64 MHz
+Starting  ITimer0 OK, millis() = 1319
+Starting  ITimer1 OK, millis() = 1319
+Time = 10001, Timer0Count = 17, , Timer1Count = 4
+Time = 20002, Timer0Count = 37, , Timer1Count = 9
+Changing Interval, Timer0 = 1000,  Timer1 = 4000
+Time = 30003, Timer0Count = 47, , Timer1Count = 11
+Time = 40004, Timer0Count = 57, , Timer1Count = 14
+Changing Interval, Timer0 = 500,  Timer1 = 2000
+Time = 50005, Timer0Count = 77, , Timer1Count = 19
+Time = 60006, Timer0Count = 97, , Timer1Count = 24
+Changing Interval, Timer0 = 1000,  Timer1 = 4000
+Time = 70007, Timer0Count = 107, , Timer1Count = 26
+Time = 80008, Timer0Count = 117, , Timer1Count = 29
+Changing Interval, Timer0 = 500,  Timer1 = 2000
+Time = 90009, Timer0Count = 137, , Timer1Count = 34
+Time = 100010, Timer0Count = 157, , Timer1Count = 39
+Changing Interval, Timer0 = 1000,  Timer1 = 4000
+Time = 110011, Timer0Count = 167, , Timer1Count = 41
+Time = 120012, Timer0Count = 177, , Timer1Count = 44
+Changing Interval, Timer0 = 500,  Timer1 = 2000
+Time = 130013, Timer0Count = 197, , Timer1Count = 49
+Time = 140014, Timer0Count = 217, , Timer1Count = 54
+Changing Interval, Timer0 = 1000,  Timer1 = 4000
+Time = 150015, Timer0Count = 227, , Timer1Count = 56
+Time = 160016, Timer0Count = 237, , Timer1Count = 59
+Changing Interval, Timer0 = 500,  Timer1 = 2000
+Time = 170017, Timer0Count = 257, , Timer1Count = 64
+Time = 180018, Timer0Count = 277, , Timer1Count = 69
+```
+
+---
+
+7. The following is the sample terminal output when running example [FakeAnalogWrite](examples/FakeAnalogWrite) to demonstrate how to use analogWrite to many pins to overcome the limitation of nRF52 analogWrite to only 4 pins or crash. Check [**Arduino Nano 33 BLE mbed os crashes when PWM on more than 3 digital pins**](https://forum.arduino.cc/index.php?topic=715883.0)
+
+```
+Starting FakeAnalogWrite on NRF52840_FEATHER
+NRF52TimerInterrupt v1.1.1
+CPU Frequency = 64 MHz
+Starting  ITimer OK, millis() = 893
+Add index 0, pin = 2, input PWM_Value=0, mapped PWM_Value= 0
+Add index 1, pin = 3, input PWM_Value=0, mapped PWM_Value= 0
+Add index 2, pin = 4, input PWM_Value=0, mapped PWM_Value= 0
+Add index 3, pin = 5, input PWM_Value=0, mapped PWM_Value= 0
+Add index 4, pin = 6, input PWM_Value=0, mapped PWM_Value= 0
+Add index 5, pin = 7, input PWM_Value=0, mapped PWM_Value= 0
+Add index 6, pin = 8, input PWM_Value=0, mapped PWM_Value= 0
+Add index 7, pin = 9, input PWM_Value=0, mapped PWM_Value= 0
+Test PWM_Value = 0, max = 255
+Update index 0, pin = 2, input PWM_Value=5, mapped PWM_Value= 14
+Update index 1, pin = 3, input PWM_Value=5, mapped PWM_Value= 14
+Update index 2, pin = 4, input PWM_Value=5, mapped PWM_Value= 14
+Update index 3, pin = 5, input PWM_Value=5, mapped PWM_Value= 14
+Update index 4, pin = 6, input PWM_Value=5, mapped PWM_Value= 14
+Update index 5, pin = 7, input PWM_Value=5, mapped PWM_Value= 14
+Update index 6, pin = 8, input PWM_Value=5, mapped PWM_Value= 14
+Update index 7, pin = 9, input PWM_Value=5, mapped PWM_Value= 14
+Test PWM_Value = 5, max = 255
+Update index 0, pin = 2, input PWM_Value=10, mapped PWM_Value= 27
+Update index 1, pin = 3, input PWM_Value=10, mapped PWM_Value= 27
+Update index 2, pin = 4, input PWM_Value=10, mapped PWM_Value= 27
+Update index 3, pin = 5, input PWM_Value=10, mapped PWM_Value= 27
+Update index 4, pin = 6, input PWM_Value=10, mapped PWM_Value= 27
+Update index 5, pin = 7, input PWM_Value=10, mapped PWM_Value= 27
+Update index 6, pin = 8, input PWM_Value=10, mapped PWM_Value= 27
+Update index 7, pin = 9, input PWM_Value=10, mapped PWM_Value= 27
+...
+Test PWM_Value = 145, max = 255
+Update index 0, pin = 2, input PWM_Value=150, mapped PWM_Value= 135
+Update index 1, pin = 3, input PWM_Value=150, mapped PWM_Value= 135
+Update index 2, pin = 4, input PWM_Value=150, mapped PWM_Value= 135
+Update index 3, pin = 5, input PWM_Value=150, mapped PWM_Value= 135
+Update index 4, pin = 6, input PWM_Value=150, mapped PWM_Value= 135
+Update index 5, pin = 7, input PWM_Value=150, mapped PWM_Value= 135
+Update index 6, pin = 8, input PWM_Value=150, mapped PWM_Value= 135
+Update index 7, pin = 9, input PWM_Value=150, mapped PWM_Value= 135
+Test PWM_Value = 150, max = 255
+Update index 0, pin = 2, input PWM_Value=155, mapped PWM_Value= 137
+Update index 1, pin = 3, input PWM_Value=155, mapped PWM_Value= 137
+Update index 2, pin = 4, input PWM_Value=155, mapped PWM_Value= 137
+Update index 3, pin = 5, input PWM_Value=155, mapped PWM_Value= 137
+Update index 4, pin = 6, input PWM_Value=155, mapped PWM_Value= 137
+Update index 5, pin = 7, input PWM_Value=155, mapped PWM_Value= 137
+Update index 6, pin = 8, input PWM_Value=155, mapped PWM_Value= 137
+Update index 7, pin = 9, input PWM_Value=155, mapped PWM_Value= 137
+Test PWM_Value = 155, max = 255
+Update index 0, pin = 2, input PWM_Value=160, mapped PWM_Value= 138
+Update index 1, pin = 3, input PWM_Value=160, mapped PWM_Value= 138
+Update index 2, pin = 4, input PWM_Value=160, mapped PWM_Value= 138
+Update index 3, pin = 5, input PWM_Value=160, mapped PWM_Value= 138
+Update index 4, pin = 6, input PWM_Value=160, mapped PWM_Value= 138
+Update index 5, pin = 7, input PWM_Value=160, mapped PWM_Value= 138
+Update index 6, pin = 8, input PWM_Value=160, mapped PWM_Value= 138
+Update index 7, pin = 9, input PWM_Value=160, mapped PWM_Value= 138
+Test PWM_Value = 160, max = 255
+Update index 0, pin = 2, input PWM_Value=165, mapped PWM_Value= 141
+Update index 1, pin = 3, input PWM_Value=165, mapped PWM_Value= 141
+Update index 2, pin = 4, input PWM_Value=165, mapped PWM_Value= 141
+Update index 3, pin = 5, input PWM_Value=165, mapped PWM_Value= 141
+Update index 4, pin = 6, input PWM_Value=165, mapped PWM_Value= 141
+Update index 5, pin = 7, input PWM_Value=165, mapped PWM_Value= 141
+Update index 6, pin = 8, input PWM_Value=165, mapped PWM_Value= 141
+Update index 7, pin = 9, input PWM_Value=165, mapped PWM_Value= 141
+Test PWM_Value = 165, max = 255
+Update index 0, pin = 2, input PWM_Value=170, mapped PWM_Value= 143
+Update index 1, pin = 3, input PWM_Value=170, mapped PWM_Value= 143
+Update index 2, pin = 4, input PWM_Value=170, mapped PWM_Value= 143
+Update index 3, pin = 5, input PWM_Value=170, mapped PWM_Value= 143
+Update index 4, pin = 6, input PWM_Value=170, mapped PWM_Value= 143
+Update index 5, pin = 7, input PWM_Value=170, mapped PWM_Value= 143
+Update index 6, pin = 8, input PWM_Value=170, mapped PWM_Value= 143
+Update index 7, pin = 9, input PWM_Value=170, mapped PWM_Value= 143
+Test PWM_Value = 170, max = 255
+```
+
 ---
 ---
+
+### Releases v1.1.1
+
+1. Add example [**Change_Interval**](examples/Change_Interval) and [**FakeAnalogWrite**](examples/FakeAnalogWrite)
+2. Bump up version to sync with other TimerInterrupt Libraries. Modify Version String.
 
 ### Releases v1.0.2
 

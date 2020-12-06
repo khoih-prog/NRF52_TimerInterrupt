@@ -19,13 +19,14 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
 
-   Version: 1.0.2
+   Version: 1.1.1
 
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
    1.0.0   K Hoang      02/11/2020 Initial coding
    1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
    1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
+   1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
 *****************************************************************************************************************************/
 /*
   nRF52 has 5 Hardware TIMERs: NRF_TIMER0-NRF_TIMER4
@@ -77,7 +78,7 @@
 #include <Arduino.h>
 #include "nrf_timer.h"
 
-#define NRF52_TIMER_INTERRUPT_VERSION       "1.0.2"
+#define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.1.1"
 
 #ifndef NRF52_TIMER_INTERRUPT_DEBUG
   #define NRF52_TIMER_INTERRUPT_DEBUG       0
