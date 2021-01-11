@@ -1,32 +1,33 @@
 /****************************************************************************************************************************
-   RPM_Measure.ino
-   For NRF52 boards
-   Written by Khoi Hoang
+  RPM_Measure.ino
+  For NRF52 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
+  Licensed under MIT license
 
-   Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-   unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
+  unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
 
-   Version: 1.1.1
+  Version: 1.2.0
 
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-   1.0.0   K Hoang      02/11/2020 Initial coding
-   1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
-   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
-   1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      02/11/2020 Initial coding
+  1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+  1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
+  1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  1.2.0   K.Hoang      11/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 /*
    Notes:
@@ -66,8 +67,11 @@
 #endif
 
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
-// Don't define NRF52_TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-#define NRF52_TIMER_INTERRUPT_DEBUG      1
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         1
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "NRF52TimerInterrupt.h"
 
@@ -87,8 +91,6 @@ unsigned int SWPin = 7;
 
 #define TIMER0_INTERVAL_MS        1
 #define DEBOUNCING_INTERVAL_MS    80
-
-#define LOCAL_DEBUG               1
 
 // Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
 // If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
@@ -119,7 +121,10 @@ void TimerHandler()
 
     avgRPM = ( 2 * avgRPM + RPM) / 3,
 
-    Serial.println("RPM = " + String(avgRPM) + ", rotationTime ms = " + String(rotationTime * TIMER0_INTERVAL_MS) );
+#if (TIMER_INTERRUPT_DEBUG > 0)
+      Serial.print("RPM = "); Serial.print(avgRPM);
+      Serial.print(", rotationTime ms = "); Serial.println(rotationTime * TIMER0_INTERVAL_MS);
+#endif
 
     rotationTime = 0;
     debounceCounter = 0;
@@ -133,7 +138,11 @@ void TimerHandler()
   {
     // If idle, set RPM to 0, don't increase rotationTime
     RPM = 0;
-    Serial.println("RPM = " + String(RPM) + ", rotationTime = " + String(rotationTime) );
+
+#if (TIMER_INTERRUPT_DEBUG > 0)  
+    Serial.print("RPM = "); Serial.print(RPM); Serial.print(", rotationTime = "); Serial.println(rotationTime);
+#endif
+
     rotationTime = 0;
   }
   else
@@ -149,15 +158,17 @@ void setup()
 
   delay(100);
   
-  Serial.println("\nStarting RPM_Measure on " + String(BOARD_NAME));
+  Serial.print(F("\nStarting RPM_Measu on ")); Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
+  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(TIMER0_INTERVAL_MS * 1000, TimerHandler))
-    Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
+  {
+    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(millis());
+  }
   else
-    Serial.println("Can't set ITimer. Select another freq. or timer");
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
 
   Serial.flush();   
 }

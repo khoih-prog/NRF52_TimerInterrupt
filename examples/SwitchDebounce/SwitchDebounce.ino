@@ -1,32 +1,33 @@
 /****************************************************************************************************************************
-   SwitchDebounce.ino
-   For NRF52 boards
-   Written by Khoi Hoang
+  SwitchDebounce.ino
+  For NRF52 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
+  Licensed under MIT license
 
-   Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-   unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
+  unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
 
-   Version: 1.1.1
+  Version: 1.2.0
 
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-   1.0.0   K Hoang      02/11/2020 Initial coding
-   1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
-   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
-   1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      02/11/2020 Initial coding
+  1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+  1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
+  1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  1.2.0   K.Hoang      11/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 /*
    Notes:
@@ -54,8 +55,11 @@
 #endif
 
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
-// Don't define NRF52_TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-#define NRF52_TIMER_INTERRUPT_DEBUG      1
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         0
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "NRF52TimerInterrupt.h"
 
@@ -73,7 +77,7 @@
 
 unsigned int SWPin = 11;
 
-#define TIMER_INTERVAL_MS         10
+#define TIMER1_INTERVAL_MS         10
 #define DEBOUNCING_INTERVAL_MS    100
 #define LONG_PRESS_INTERVAL_MS    5000
 
@@ -91,37 +95,55 @@ unsigned int debounceCountSWReleased = 0;
 bool toggle0 = false;
 bool toggle1 = false;
   
-void TimerHandler(void)
+void TimerHandler()
 {
+  static unsigned int debounceCountSWPressed  = 0;
+  static unsigned int debounceCountSWReleased = 0;
+
+#if (TIMER_INTERRUPT_DEBUG > 1)
+  static unsigned long SWPressedTime;
+  static unsigned long SWReleasedTime;
+
+  unsigned long currentMillis = millis();
+#endif
+
   if ( (!digitalRead(SWPin)) )
   {
     // Start debouncing counting debounceCountSWPressed and clear debounceCountSWReleased
     debounceCountSWReleased = 0;
 
-    if (++debounceCountSWPressed >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS)
+    if (++debounceCountSWPressed >= DEBOUNCING_INTERVAL_MS / TIMER1_INTERVAL_MS)
     {
       // Call and flag SWPressed
       if (!SWPressed)
       {
+#if (TIMER_INTERRUPT_DEBUG > 1)   
+        SWPressedTime = currentMillis;
+        
+        Serial.print("SW Press, from millis() = "); Serial.println(SWPressedTime - DEBOUNCING_INTERVAL_MS);
+#endif
+
         SWPressed = true;
         // Do something for SWPressed here in ISR
         // But it's better to use outside software timer to do your job instead of inside ISR
         //Your_Response_To_Press();
-        digitalWrite(LED_BUILTIN, toggle0);
-        toggle0 = !toggle0;
       }
 
-      if (debounceCountSWPressed >= LONG_PRESS_INTERVAL_MS / TIMER_INTERVAL_MS)
+      if (debounceCountSWPressed >= LONG_PRESS_INTERVAL_MS / TIMER1_INTERVAL_MS)
       {
         // Call and flag SWLongPressed
         if (!SWLongPressed)
         {
+#if (TIMER_INTERRUPT_DEBUG > 1)
+          Serial.print("SW Long Pressed, total time ms = "); Serial.print(currentMillis);
+          Serial.print(" - "); Serial.print(SWPressedTime - DEBOUNCING_INTERVAL_MS);
+          Serial.print(" = "); Serial.println(currentMillis - SWPressedTime + DEBOUNCING_INTERVAL_MS);                                           
+#endif          
+
           SWLongPressed = true;
           // Do something for SWLongPressed here in ISR
           // But it's better to use outside software timer to do your job instead of inside ISR
           //Your_Response_To_Long_Press();
-          digitalWrite(LED_BLUE, toggle1);
-          toggle1 = !toggle1;
         }
       }
     }
@@ -129,9 +151,14 @@ void TimerHandler(void)
   else
   {
     // Start debouncing counting debounceCountSWReleased and clear debounceCountSWPressed
-    if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS))
+    if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER1_INTERVAL_MS))
     {
+#if (TIMER_INTERRUPT_DEBUG > 1)      
+      SWReleasedTime = currentMillis;
+
       // Call and flag SWPressed
+      Serial.print("SW Released, from millis() = "); Serial.println(SWReleasedTime);
+#endif
 
       SWPressed     = false;
       SWLongPressed = false;
@@ -141,6 +168,10 @@ void TimerHandler(void)
       //Your_Response_To_Release();
 
       // Call and flag SWPressed
+#if (TIMER_INTERRUPT_DEBUG > 1)
+      Serial.print("SW Pressed total time ms = "); Serial.println(SWReleasedTime - SWPressedTime);
+#endif
+
       debounceCountSWPressed = 0;
     }
   }
@@ -156,21 +187,24 @@ void setup()
   while (!Serial);
 
   delay(100);
-
-  Serial.printf("\nStarting SwitchDebounce on %s\n", BOARD_NAME);
+  
+  Serial.print(F("\nStarting SwitchDebounce on ")); Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
+  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
  
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
-    Serial.printf("Starting  ITimer OK, millis() = %ld\n", millis());
+  if (ITimer.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler))
+  {
+    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(millis());
+  }
   else
-    Serial.println("Can't set ITimer. Select another freq., duration or timer");
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
 }
 
 void printResult(uint32_t currTime)
 {
-  Serial.printf("Time = %ld, Switch = %s\n", currTime, SWLongPressed? "LongPressed" : (SWPressed? "Pressed" : "Released") );
+  Serial.print(F("Time = ")); Serial.print(currTime);
+  Serial.print(F(", Switch = ")); Serial.println(SWLongPressed? F("LongPressed") : (SWPressed? F("Pressed") : F("Released")) );
 }
 
 #define CHECK_INTERVAL_MS     1000L

@@ -1,35 +1,39 @@
 /****************************************************************************************************************************
-   NRF52_ISR_Timer.h
-   For NRF52 boards
-   Written by Khoi Hoang
+  NRF52_ISR_Timer.h
+  For NRF52 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/NRF52_TimerInterrupt
+  Licensed under MIT license
 
-   Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-   unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
+  unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
 
-   Version: 1.1.1
+  Version: 1.2.0
 
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-   1.0.0   K Hoang      02/11/2020 Initial coding
-   1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
-   1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
-   1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      02/11/2020 Initial coding
+  1.0.1   K Hoang      06/11/2020 Add complicated example ISR_16_Timers_Array using all 16 independent ISR Timers.
+  1.0.2   K Hoang      24/11/2020 Add complicated example ISR_16_Timers_Array_Complex and optimize examples
+  1.1.1   K.Hoang      06/12/2020 Add Change_Interval example. Bump up version to sync with other TimerInterrupt Libraries
+  1.2.0   K.Hoang      11/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 
 #pragma once
+
+#ifndef ISR_TIMER_GENERIC_H
+#define ISR_TIMER_GENERIC_H
 
 #if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
       defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
@@ -37,6 +41,12 @@
       || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
   #error This code is designed to run on nRF52 platform! Please check your Tools->Board setting.
 #endif
+
+#ifndef NRF52_TIMER_INTERRUPT_VERSION
+  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.2.0"
+#endif
+
+#include "TimerInterrupt_Generic_Debug.h"
 
 #include <stddef.h>
 
@@ -174,3 +184,4 @@ class NRF52_ISR_Timer
 
 #include "NRF52_ISR_Timer-Impl.h"
 
+#endif    // ISR_TIMER_GENERIC_H
