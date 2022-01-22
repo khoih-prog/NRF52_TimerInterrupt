@@ -11,18 +11,13 @@
 
 ## Table of Contents
 
+* [Important Change from v1.4.0](#Important-Change-from-v140)
 * [Why do we need this NRF52_TimerInterrupt library](#why-do-we-need-this-nrf52_timerinterrupt-library)
   * [Features](#features)
   * [Why using ISR-based Hardware Timer Interrupt is better](#why-using-isr-based-hardware-timer-interrupt-is-better)
   * [Currently supported Boards](#currently-supported-boards)
   * [Important Notes about ISR](#important-notes-about-isr)
-* [Changelog](#changelog)
-  * [Releases v1.3.0](#releases-v130)
-  * [Releases v1.2.0](#releases-v120)
-  * [Releases v1.1.1](#releases-v111)
-  * [Releases v1.0.2](#releases-v102)
-  * [Releases v1.0.1](#releases-v101)
-  * [Releases v1.0.0](#releases-v100)
+* [Changelog](changelog.md)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Use Arduino Library Manager](#use-arduino-library-manager)
@@ -61,6 +56,7 @@
   * [ 10. TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
   * [ 11. **FakeAnalogWrite**](examples/FakeAnalogWrite)
   * [ 12. **Change_Interval**](examples/Change_Interval)
+  * [ 13. **multiFileProject**](examples/multiFileProject) **New**
 * [Example ISR_Timer_Complex_Ethernet](#example-isr_timer_complex_ethernet)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_Timer_Complex_Ethernet on Adafruit NRF52840_FEATHER using W5500 Ethernet](#1-isr_timer_complex_ethernet-on-adafruit-nrf52840_feather-using-w5500-ethernet)
@@ -83,6 +79,10 @@
 
 ---
 ---
+
+### Important Change from v1.4.0
+
+Please have a look at [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error)
 
 ### Why do we need this [NRF52_TimerInterrupt library](https://github.com/khoih-prog/NRF52_TimerInterrupt)
 
@@ -137,63 +137,26 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 2. Typically global variables are used to pass data between an ISR and the main program. To make sure variables shared between an ISR and the main program are updated correctly, declare them as volatile.
 
----
----
-
-## Changelog
-
-### Releases v1.3.0
-
-1. Add support to Adafruit nRF52 core v0.22.0+
-2. Add support to Raytac MDBT50Q_RX Dongle
-
-**Warnings for Releases v1.2.0-** : Use [`Adafruit nRF52 v0.22.0+`](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/tag/0.22.0) will create **compiler errors**. If so, please use the [`Adafruit nRF52 v0.21.0`](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/tag/0.21.0). It's advisable to update to Releases v1.3.0+
-
-### Releases v1.2.0
-
-1. Add better debug feature.
-2. Optimize code and examples to reduce RAM usage
-3. Add Table of Contents
-
-### Releases v1.1.1
-
-1. Add example [**Change_Interval**](examples/Change_Interval) and [**FakeAnalogWrite**](examples/FakeAnalogWrite)
-2. Bump up version to sync with other TimerInterrupt Libraries. Modify Version String.
-
-### Releases v1.0.2
-
-1. Add complicated example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
-2. Optimize examples
-
-### Releases v1.0.1
-
-1. Add complicated example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) utilizing and demonstrating the full usage of 16 independent ISR Timers.
-
-### Releases v1.0.0
-
-1. Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-2. Using cpp code besides Impl.h code to use if Multiple-Definition linker error.
-
 
 ---
 ---
 
 ## Prerequisites
 
- 1. [`Arduino IDE 1.8.15+` for Arduino](https://www.arduino.cc/en/Main/Software)
- 2. [`Adafruit nRF52 v0.24.0+`](https://github.com/adafruit/Adafruit_nRF52_Arduino) for nRF52 boards such as Adafruit NRF52840_FEATHER, NRF52832_FEATHER, NRF52840_FEATHER_SENSE, NRF52840_ITSYBITSY, NRF52840_CIRCUITPLAY, NRF52840_CLUE, NRF52840_METRO, NRF52840_PCA10056, PARTICLE_XENON, **NINA_B302_ublox**, etc. [![GitHub release](https://img.shields.io/github/release/adafruit/Adafruit_nRF52_Arduino.svg)](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/latest)
- 3. [`Blynk library 0.6.1`](https://github.com/blynkkk/blynk-library/releases). [![Latest release](https://img.shields.io/github/release/blynkkk/blynk-library.svg)](https://github.com/blynkkk/blynk-library/releases/latest/) to use with certain example.
+ 1. [`Arduino IDE 1.8.19+` for Arduino](https://www.arduino.cc/en/Main/Software)
+ 2. [`Adafruit nRF52 v1.3.0+`](https://github.com/adafruit/Adafruit_nRF52_Arduino) for nRF52 boards such as Adafruit NRF52840_FEATHER, NRF52832_FEATHER, NRF52840_FEATHER_SENSE, NRF52840_ITSYBITSY, NRF52840_CIRCUITPLAY, NRF52840_CLUE, NRF52840_METRO, NRF52840_PCA10056, PARTICLE_XENON, **NINA_B302_ublox**, etc. [![GitHub release](https://img.shields.io/github/release/adafruit/Adafruit_nRF52_Arduino.svg)](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/latest)
+ 3. [`Blynk library 1.0.1`](https://github.com/blynkkk/blynk-library/releases). [![Latest release](https://img.shields.io/github/release/blynkkk/blynk-library.svg)](https://github.com/blynkkk/blynk-library/releases/latest/) to use with certain example.
  4. To use with certain example, depending on which Ethernet card you're using:
    - [`Ethernet library v2.0.0+`](https://github.com/arduino-libraries/Ethernet) for W5100, W5200 and W5500.  [![GitHub release](https://img.shields.io/github/release/arduino-libraries/Ethernet.svg)](https://github.com/arduino-libraries/Ethernet/releases/latest)
    - [`EthernetLarge library v2.0.0+`](https://github.com/OPEnSLab-OSU/EthernetLarge) for W5100, W5200 and W5500.
    - [`Ethernet2 library v1.0.4+`](https://github.com/khoih-prog/Ethernet2) for W5500. [![GitHub release](https://img.shields.io/github/release/adafruit/Ethernet2.svg)](https://github.com/adafruit/Ethernet2/releases/latest)
    - [`Ethernet3 library v1.5.5+`](https://github.com/sstaub/Ethernet3) for W5500/WIZ550io/WIZ850io/USR-ES1 with Wiznet W5500 chip. [![GitHub release](https://img.shields.io/github/release/sstaub/Ethernet3.svg)](https://github.com/sstaub/Ethernet3/releases/latest)
-   - [`EthernetENC library v2.0.1+`](https://github.com/jandrassy/EthernetENC) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/jandrassy/EthernetENC.svg)](https://github.com/jandrassy/EthernetENC/releases/latest). **New and Better**
-   - [`UIPEthernet library v2.0.10+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/UIPEthernet/UIPEthernet.svg)](https://github.com/UIPEthernet/UIPEthernet/releases/latest)
- 5. [`WiFiNINA_Generic library v1.8.13+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
- 6. [`Blynk_WiFiNINA_WM library 1.1.1+`](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
+   - [`EthernetENC library v2.0.2+`](https://github.com/jandrassy/EthernetENC) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/jandrassy/EthernetENC.svg)](https://github.com/jandrassy/EthernetENC/releases/latest). **New and Better**
+   - [`UIPEthernet library v2.0.11+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/UIPEthernet/UIPEthernet.svg)](https://github.com/UIPEthernet/UIPEthernet/releases/latest)
+ 5. [`WiFiNINA_Generic library v1.8.14-3+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
+ 6. [`Blynk_WiFiNINA_WM library 1.1.2+`](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
  7. To use with certain example
-   - [`SimpleTimer library`](https://github.com/schinken/SimpleTimer) for [ISR_16_Timers_Array example](examples/ISR_16_Timers_Array).
+   - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
    
 ---
 ---
@@ -228,16 +191,16 @@ Another way to install is to:
 
 #### 1. For Adafruit nRF52840 and nRF52832 boards
 
-**To be able to compile, run and automatically detect and display BOARD_NAME on nRF52840/nRF52832 boards**, you have to copy the whole [nRF52 0.24.0](Packages_Patches/adafruit/hardware/nrf52/0.24.0) directory into Adafruit nRF52 directory (~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0). 
+**To be able to compile, run and automatically detect and display BOARD_NAME on nRF52840/nRF52832 boards**, you have to copy the whole [nRF52 1.3.0](Packages_Patches/adafruit/hardware/nrf52/1.3.0) directory into Adafruit nRF52 directory (~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0). 
 
-Supposing the Adafruit nRF52 version is 0.24.0. These files must be copied into the directory:
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/platform.txt`
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/boards.txt`
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/variants/NINA_B302_ublox/variant.h`
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/variants/NINA_B302_ublox/variant.cpp`
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/variants/NINA_B112_ublox/variant.h`
-- `~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/variants/NINA_B112_ublox/variant.cpp`
-- **`~/.arduino15/packages/adafruit/hardware/nrf52/0.24.0/cores/nRF5/Udp.h`**
+Supposing the Adafruit nRF52 version is 1.3.0. These files must be copied into the directory:
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/platform.txt`
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/boards.txt`
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/variants/NINA_B302_ublox/variant.h`
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/variants/NINA_B302_ublox/variant.cpp`
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/variants/NINA_B112_ublox/variant.h`
+- `~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/variants/NINA_B112_ublox/variant.cpp`
+- **`~/.arduino15/packages/adafruit/hardware/nrf52/1.3.0/cores/nRF5/Udp.h`**
 
 Whenever a new version is installed, remember to copy these files into the new version directory. For example, new version is x.yy.z
 These files must be copied into the directory:
@@ -321,24 +284,27 @@ To add UDP Multicast support, necessary for the [**UPnP_Generic library**](https
 
 ### HOWTO Fix `Multiple Definitions` Linker Error
 
-The current library implementation, using **xyz-Impl.h instead of standard xyz.cpp**, possibly creates certain `Multiple Definitions` Linker error in certain use cases. Although it's simple to just modify several lines of code, either in the library or in the application, the library is adding 2 more source directories
+The current library implementation, using `xyz-Impl.h` instead of standard `xyz.cpp`, possibly creates certain `Multiple Definitions` Linker error in certain use cases.
 
-1. **scr_h** for new h-only files
-2. **src_cpp** for standard h/cpp files
+You can include `.hpp`
 
-besides the standard **src** directory.
+```
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "NRF52TimerInterrupt.hpp"     //https://github.com/khoih-prog/NRF52_TimerInterrupt
 
-To use the **old standard cpp** way, locate this library' directory, then just 
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "NRF52_ISR_Timer.hpp"         //https://github.com/khoih-prog/NRF52_TimerInterrupt
+```
 
-1. **Delete the all the files in src directory.**
-2. **Copy all the files in src_cpp directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+in many files. But be sure to use the following `.h` files **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-To re-use the **new h-only** way, just 
+```
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "NRF52TimerInterrupt.h"       //https://github.com/khoih-prog/NRF52_TimerInterrupt
 
-1. **Delete the all the files in src directory.**
-2. **Copy the files in src_h directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "NRF52_ISR_Timer.h"           //https://github.com/khoih-prog/NRF52_TimerInterrupt
+```
 
 ---
 ---
@@ -545,8 +511,9 @@ void setup()
  8. [SwitchDebounce](examples/SwitchDebounce)
  9. [TimerInterruptTest](examples/TimerInterruptTest)
 10. [TimerInterruptLEDDemo](examples/TimerInterruptLEDDemo)
-11. [**FakeAnalogWrite**](examples/FakeAnalogWrite). New.
-12. [**Change_Interval**](examples/Change_Interval). New.
+11. [**FakeAnalogWrite**](examples/FakeAnalogWrite).
+12. [**Change_Interval**](examples/Change_Interval).
+13. [**multiFileProject**](examples/multiFileProject). **New**
 
 ---
 ---
@@ -557,8 +524,8 @@ void setup()
 #if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
       defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
       defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on nRF52 platform! Please check your Tools->Board setting.
+      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
+  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
 #endif
 
 #define BLYNK_PRINT Serial
@@ -614,7 +581,10 @@ void setup()
 #define TIMER_INTERRUPT_DEBUG         0
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "NRF52TimerInterrupt.h"
+
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "NRF52_ISR_Timer.h"
 
 #define HW_TIMER_INTERVAL_MS      1
@@ -841,10 +811,10 @@ While software timer, **programmed for 2s, is activated after 4.867s !!!**. Then
 
 ```
 Starting ISR_Timer_Complex_Ethernet on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 50000
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 20.00, _count = 10000
 Starting  ITimer OK, millis() = 1419
 [1419] Getting IP...
 [1419] MAC: FE-BE-97-DA-C3-EA
@@ -931,14 +901,14 @@ The following is the sample terminal output when running example [**TimerInterru
 
 ```
 Starting TimerInterruptTest on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
-Starting  ITimer0 OK, millis() = 1406
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER4
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 3000000
-Starting  ITimer1 OK, millis() = 1407
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 1.00, _count = 1000000
+Starting  ITimer0 OK, millis() = 1020
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER4, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 0.33, _count = 3000000
+Starting  ITimer1 OK, millis() = 1021
 Stop ITimer0, millis() = 5001
 Start ITimer0, millis() = 10002
 Stop ITimer1, millis() = 15001
@@ -971,14 +941,14 @@ The following is the sample terminal output when running example [**Argument_Non
 
 ```
 Starting Argument_None on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 1000000
-Starting  ITimer0 OK, millis() = 1505
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 5000000
-Starting  ITimer1 OK, millis() = 1506
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 1.00, _count = 1000000
+Starting ITimer0 OK, millis() = 1024
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 0.20, _count = 5000000
+Starting ITimer1 OK, millis() = 1025
 Time = 10001, Timer0Count = 8, , Timer1Count = 1
 Time = 20002, Timer0Count = 18, , Timer1Count = 3
 Time = 30003, Timer0Count = 28, , Timer1Count = 5
@@ -1004,11 +974,11 @@ In this example, 16 independent ISR Timers are used, yet utilized just one Hardw
 
 ```
 Starting ISR_16_Timers_Array_Complex on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER2
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
-Starting  ITimer OK, millis() = 1409
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 100.00, _count = 10000
+Starting ITimer OK, millis() = 1518
 SimpleTimer : 2s, ms = 11409, Dms : 10000
 Timer : 0, programmed : 5000, actual : 5005
 Timer : 1, programmed : 10000, actual : 0
@@ -1155,10 +1125,10 @@ The following is the sample terminal output when running example [**SwitchDeboun
 
 ```
 Starting SwitchDebounce on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-NRF52TimerInterrupt: F_CPU (MHz) = 64, Timer = NRF_TIMER1
-NRF52TimerInterrupt: _fre = 1000000.00, _count = 10000
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 100.00, _count = 10000
 Starting  ITimer OK, millis() = 1560
 Time = 1560, Switch = Released
 Time = 2561, Switch = Released
@@ -1180,7 +1150,6 @@ Time = 84643, Switch = LongPressed
 Time = 85644, Switch = Released
 Time = 86645, Switch = Released
 Time = 87646, Switch = Released
-
 ```
 
 ---
@@ -1191,10 +1160,14 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-Starting  ITimer0 OK, millis() = 1319
-Starting  ITimer1 OK, millis() = 1319
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER4, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 2.00, _count = 500000
+Starting ITimer0 OK, millis() = 1321
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER3, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 0.50, _count = 2000000
+Starting ITimer1 OK, millis() = 1322
 Time = 10001, Timer0Count = 17, , Timer1Count = 4
 Time = 20002, Timer0Count = 37, , Timer1Count = 9
 Changing Interval, Timer0 = 1000,  Timer1 = 4000
@@ -1231,17 +1204,19 @@ The following is the sample terminal output when running example [FakeAnalogWrit
 
 ```
 Starting FakeAnalogWrite on NRF52840_FEATHER
-NRF52TimerInterrupt v1.3.0
+NRF52TimerInterrupt v1.4.0
 CPU Frequency = 64 MHz
-Starting  ITimer OK, millis() = 893
-Add index 0, pin = 2, input PWM_Value=0, mapped PWM_Value= 0
-Add index 1, pin = 3, input PWM_Value=0, mapped PWM_Value= 0
-Add index 2, pin = 4, input PWM_Value=0, mapped PWM_Value= 0
-Add index 3, pin = 5, input PWM_Value=0, mapped PWM_Value= 0
-Add index 4, pin = 6, input PWM_Value=0, mapped PWM_Value= 0
-Add index 5, pin = 7, input PWM_Value=0, mapped PWM_Value= 0
-Add index 6, pin = 8, input PWM_Value=0, mapped PWM_Value= 0
-Add index 7, pin = 9, input PWM_Value=0, mapped PWM_Value= 0
+[TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER3, Timer Clock (Hz) = 1000000.00
+[TISR] Frequency = 10000.00, _count = 100
+Starting ITimer OK, millis() = 1024
+Add index = 0, pin = 2, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 1, pin = 3, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 2, pin = 4, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 3, pin = 5, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 4, pin = 6, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 5, pin = 7, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 6, pin = 8, input PWM_Value = 0, mapped PWM_Value = 0
+Add index = 7, pin = 9, input PWM_Value = 0, mapped PWM_Value = 0
 Test PWM_Value = 0, max = 255
 Update index 0, pin = 2, input PWM_Value=5, mapped PWM_Value= 14
 Update index 1, pin = 3, input PWM_Value=5, mapped PWM_Value= 14
@@ -1337,47 +1312,6 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 ---
 
-## Releases
-
-### Releases v1.3.0
-
-1. Add support to Adafruit nRF52 core v0.22.0+
-2. Add support to Raytac MDBT50Q_RX Dongle
-
-**Warnings for Releases v1.2.0-** : Use [`Adafruit nRF52 v0.22.0+`](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/tag/0.22.0) will create **compiler errors**. If so, please use the [`Adafruit nRF52 v0.21.0`](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/tag/0.21.0). It's advisable to update to Releases v1.3.0+
-
-### Releases v1.2.0
-
-1. Add better debug feature.
-2. Optimize code and examples to reduce RAM usage
-3. Add Table of Contents
-
-### Releases v1.1.1
-
-1. Add example [**Change_Interval**](examples/Change_Interval) and [**FakeAnalogWrite**](examples/FakeAnalogWrite)
-2. Bump up version to sync with other TimerInterrupt Libraries. Modify Version String.
-
-### Releases v1.0.2
-
-1. Add complicated example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
-2. Optimize examples
-
-### Releases v1.0.1
-
-1. Add complicated example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) utilizing and demonstrating the full usage of 16 independent ISR Timers.
-
-### Releases v1.0.0
-
-1. Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-2. Using cpp code besides Impl.h code to use if Multiple-Definition linker error.
-
-#### Supported Boards
-
-  - **AdaFruit Feather nRF52832, nRF52840 Express, BlueFruit Sense, Itsy-Bitsy nRF52840 Express, Metro nRF52840 Express, NINA_B302_ublox, NINA_B112_ublox etc.**
-
----
----
-
 ### Issues
 
 Submit issues to: [NRF52_TimerInterrupt issues](https://github.com/khoih-prog/NRF52_TimerInterrupt/issues)
@@ -1397,6 +1331,8 @@ Submit issues to: [NRF52_TimerInterrupt issues](https://github.com/khoih-prog/NR
 3. Longer time interval
 4. Similar features for remaining Arduino boards such as AVR, ESP32, ESP8266, STM32, SAM-DUE, SAMD21/SAMD51, mbed-nRF52, Teensy, etc.
 5. Add Table of Contents
+6. Fix `multiple-definitions` linker error
+7. Optimize library code by using `reference-passing` instead of `value-passing`
 
 ---
 ---

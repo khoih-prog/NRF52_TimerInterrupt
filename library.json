@@ -22,8 +22,9 @@
       "tests"
     ]
   },
+  "license": "MIT",
   "frameworks": "*",
   "platforms": ["nordicnrf52", "nrf52"],
   "examples": "examples/*/*/*.ino",
-  "license": "MIT"
+  "headers": ["NRF52TimerInterrupt.h", "NRF52TimerInterrupt.hpp", "NRF52_ISR_Timer.h", "NRF52_ISR_Timer.hpp"]
 }
