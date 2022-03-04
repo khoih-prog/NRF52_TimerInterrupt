@@ -186,7 +186,7 @@ Another way to install is to:
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**NRF52_TimerInterrupt** library](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt) or [**NRF52_TimerInterrupt** library](https://platformio.org/lib/show/11427/NRF52_TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**NRF52_TimerInterrupt** library](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt) by using [Library Manager](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
