@@ -132,6 +132,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ### Currently supported Boards
 
   - **AdaFruit Feather nRF52832, nRF52840 Express, BlueFruit Sense, Itsy-Bitsy nRF52840 Express, Metro nRF52840 Express, NINA_B302_ublox, NINA_B112_ublox etc.**
+  - **Sparkfun Pro nRF52840 Mini**
 
 ---
 
