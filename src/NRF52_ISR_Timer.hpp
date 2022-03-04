@@ -19,7 +19,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.0
+  Version: 1.4.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -30,6 +30,7 @@
   1.2.0   K.Hoang      11/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
   1.3.0   K.Hoang      13/08/2021 Add support to Adafruit nRF52 core v0.22.0+
   1.4.0   K.Hoang      21/01/2022 Fix `multiple-definitions` linker error. Fix bug
+  1.4.1   K.Hoang      03/03/2022 Add support to Sparkfun Pro nRF52840 Mini
 *****************************************************************************************************************************/
 
 #pragma once
@@ -45,13 +46,13 @@
 #endif
 
 #ifndef NRF52_TIMER_INTERRUPT_VERSION
-  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.0"
+  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.1"
   
   #define NRF52_TIMER_INTERRUPT_VERSION_MAJOR      1
   #define NRF52_TIMER_INTERRUPT_VERSION_MINOR      4
-  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      0
+  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      1
 
-  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004000  
+  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004001
 #endif
 
 #include "TimerInterrupt_Generic_Debug.h"

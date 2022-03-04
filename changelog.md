@@ -12,6 +12,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v1.4.1](#releases-v141)
   * [Releases v1.4.0](#releases-v140)
   * [Releases v1.3.0](#releases-v130)
   * [Releases v1.2.0](#releases-v120)
@@ -24,6 +25,11 @@
 ---
 
 ## Changelog
+
+### Releases v1.4.1
+
+1. Add support to `Sparkfun Pro nRF52840 Mini`
+2. Update `Packages_Patches`
 
 ### Releases v1.4.0
 

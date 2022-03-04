@@ -6,7 +6,8 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/NRF52_TimerInterrupt.svg)](http://github.com/khoih-prog/NRF52_TimerInterrupt/issues)
 
-<a href="https://www.buymeacoffee.com/khoihprog6" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
 
 
 ---
@@ -60,7 +61,7 @@
   * [ 11. **FakeAnalogWrite**](examples/FakeAnalogWrite)
   * [ 12. **Change_Interval**](examples/Change_Interval)
   * [ 13. **multiFileProject**](examples/multiFileProject) **New**
-* [Example ISR_Timer_Complex_Ethernet](#example-isr_timer_complex_ethernet)
+* [Example ISR_16_Timers_Array_Complex](#example-ISR_16_Timers_Array_Complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_Timer_Complex_Ethernet on Adafruit NRF52840_FEATHER using W5500 Ethernet](#1-isr_timer_complex_ethernet-on-adafruit-nrf52840_feather-using-w5500-ethernet)
   * [2. TimerInterruptTest on Adafruit NRF52840_FEATHER](#2-timerinterrupttest-on-adafruit-nrf52840_feather)
@@ -215,6 +216,10 @@ These files must be copied into the directory:
 - `~/.arduino15/packages/adafruit/hardware/nrf52/x.yy.z/variants/NINA_B112_ublox/variant.h`
 - `~/.arduino15/packages/adafruit/hardware/nrf52/x.yy.z/variants/NINA_B112_ublox/variant.cpp`
 - **`~/.arduino15/packages/adafruit/hardware/nrf52/x.yy.z/cores/nRF5/Udp.h`**
+
+---
+
+To use `Sparkfun Pro nRF52840 Mini`, you must install `Packages_Patches` and use Adafruit nrf52 core v1.0.0+
 
 ---
 ---
@@ -521,286 +526,11 @@ void setup()
 ---
 ---
 
-### Example [ISR_Timer_Complex_Ethernet](examples/ISR_Timer_Complex_Ethernet)
+### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
-```
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
-#define BLYNK_PRINT Serial
-
-//#define BLYNK_DEBUG
-#ifdef BLYNK_DEBUG
-  #undef BLYNK_DEBUG
-#endif
-
-/* Comment this out to disable prints and save space */
-#define BLYNK_PRINT Serial
-
-//  If don't use USE_UIP_ETHERNET => use W5x00 with Ethernet library
-#define USE_UIP_ETHERNET        false
-
-#if (USE_UIP_ETHERNET)
-  #define ETHERNET_NAME     "ENC28J60 Ethernet Shield"
-#else
-  #define ETHERNET_NAME     "W5x00 Ethernet Shield"
-#endif
-
-#define BLYNK_NO_YIELD
-
-#if USE_UIP_ETHERNET
-  #include <BlynkSimpleUIPEthernet.h>
-#else
-  #include <BlynkSimpleEthernet.h>
-#endif
-
-#define USE_LOCAL_SERVER      true
-
-#if USE_LOCAL_SERVER
-  char auth[] = "******";
-  char server[] = "account.duckdns.org";
-  //char server[] = "192.168.2.112";
-
-#else
-  char auth[] = "******";
-  char server[] = "blynk-cloud.com";
-#endif
-  
-  #define BLYNK_HARDWARE_PORT       8080
-
-#if !(USE_UIP_ETHERNET)
-  #define W5100_CS  10
-  #define SDCARD_CS 4
-#endif
-
-// These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
-// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
-// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         0
-#define _TIMERINTERRUPT_LOGLEVEL_     0
-
-// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "NRF52TimerInterrupt.h"
-
-// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "NRF52_ISR_Timer.h"
-
-#define HW_TIMER_INTERVAL_MS      1
-
-volatile uint32_t lastMillis = 0;
-
-// Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
-// If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
-
-// Init NRF52 timer NRF_TIMER1
-NRF52Timer ITimer(NRF_TIMER_2);
-
-// Init NRF52_ISR_Timer
-// Each NRF52_ISR_Timer can service 16 different ISR-based timers
-NRF52_ISR_Timer ISR_Timer;
-
-// Ibit Blynk Timer
-BlynkTimer blynkTimer;
-
-#ifndef LED_BUILTIN
-  #define LED_BUILTIN       PB0               // Pin 33/PB0 control on-board LED_GREEN on F767ZI
-#endif
-
-#define LED_TOGGLE_INTERVAL_MS        5000L
-
-#define TIMER_INTERVAL_2S             2000L
-#define TIMER_INTERVAL_5S             5000L
-#define TIMER_INTERVAL_11S            11000L
-#define TIMER_INTERVAL_21S            21000L
-
-void TimerHandler()
-{
-  static bool toggle  = false;
-  static bool started = false;
-  static int timeRun  = 0;
-
-  ISR_Timer.run();
-
-  // Toggle LED every LED_TOGGLE_INTERVAL_MS = 5000ms = 5s
-  if (++timeRun == (LED_TOGGLE_INTERVAL_MS / HW_TIMER_INTERVAL_MS) )
-  {
-    timeRun = 0;
-
-    if (!started)
-    {
-      started = true;
-      pinMode(LED_BUILTIN, OUTPUT);
-    }
-
-    //timer interrupt toggles pin LED_BUILTIN
-    digitalWrite(LED_BUILTIN, toggle);
-    toggle = !toggle;
-  }
-}
-
-// In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
-// The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
-// Or you can get this run-time error / crash
-void doingSomething2s()
-{
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-  unsigned long deltaMillis = millis() - previousMillis;
+https://github.com/khoih-prog/NRF52_TimerInterrupt/blob/29768a617f3fe4accc2f1115623b3e093a9cc6e9/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L35-L366
 
 
-  if (previousMillis > TIMER_INTERVAL_2S)
-  {
-    Serial.print("2s: Delta ms = "); Serial.println(deltaMillis);
-  }
-
-  previousMillis = millis();
-#endif
-}
-
-// In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
-// The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
-// Or you can get this run-time error / crash
-void doingSomething5s()
-{
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-  unsigned long deltaMillis = millis() - previousMillis;
-
-
-  if (previousMillis > TIMER_INTERVAL_5S)
-  {
-    Serial.print("5s: Delta ms = "); Serial.println(deltaMillis);
-  }
-
-  previousMillis = millis();
-#endif
-}
-
-// In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
-// The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
-// Or you can get this run-time error / crash
-void doingSomething11s()
-{
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-  unsigned long deltaMillis = millis() - previousMillis;
-
-
-  if (previousMillis > TIMER_INTERVAL_11S)
-  {
-    Serial.print("11s: Delta ms = "); Serial.println(deltaMillis);
-  }
-
-  previousMillis = millis();
-#endif
-}
-
-// In NRF52, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
-// The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
-// Or you can get this run-time error / crash
-void doingSomething21s()
-{
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-  unsigned long deltaMillis = millis() - previousMillis;
-
-
-  if (previousMillis > TIMER_INTERVAL_21S)
-  {
-    Serial.print("21s: Delta ms = "); Serial.println(deltaMillis);
-  }
-
-  previousMillis = millis();
-#endif
-}
-
-#define BLYNK_TIMER_MS        2000L
-
-// Here is software Timer, you can do somewhat fancy stuffs without many issues.
-// But always avoid
-// 1. Long delay() it just doing nothing and pain-without-gain wasting CPU power.Plan and design your code / strategy ahead
-// 2. Very long "do", "while", "for" loops without predetermined exit time.
-void blynkDoingSomething2s()
-{
-  static unsigned long previousMillis = lastMillis;
-  
-  Serial.print(F("blynkDoingSomething2s: Delta programmed ms = ")); Serial.print(BLYNK_TIMER_MS);
-  Serial.print(F(", actual = ")); Serial.println(millis() - previousMillis);
-  
-  previousMillis = millis();
-}
-
-void setup()
-{
-  Serial.begin(115200);
-  while (!Serial);
-
-  delay(100);
-  
-  Serial.print(F("\nStarting ISR_Timer_Complex_Ethernet on ")); Serial.println(BOARD_NAME);
-  Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
-
-  // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
-  blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);
-
-  // Interval in microsecs
-  if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
-  {
-    lastMillis = millis();
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
-  }
-  else
-    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
-
-  // Just to demonstrate, don't use too many ISR Timers if not absolutely necessary
-  // You can use up to 16 timer for each ISR_Timer
-  ISR_Timer.setInterval(TIMER_INTERVAL_2S,    doingSomething2s);
-  ISR_Timer.setInterval(TIMER_INTERVAL_5S,    doingSomething5s);
-  ISR_Timer.setInterval(TIMER_INTERVAL_11S,   doingSomething11s);
-  ISR_Timer.setInterval(TIMER_INTERVAL_21S,   doingSomething21s);
-
-#if !(USE_BUILTIN_ETHERNET || USE_UIP_ETHERNET)
-  pinMode(SDCARD_CS, OUTPUT);
-  digitalWrite(SDCARD_CS, HIGH); // Deselect the SD card
-#endif
-
-#if USE_LOCAL_SERVER
-  Blynk.begin(auth, server, BLYNK_HARDWARE_PORT);
-#else
-  Blynk.begin(auth);
-  // You can also specify server:
-  //Blynk.begin(auth, server, BLYNK_HARDWARE_PORT);
-#endif
-
-  if (Blynk.connected())
-  {
-    Serial.print(F("IP = ")); Serial.println(Ethernet.localIP());
-  }
-}
-
-#define BLOCKING_TIME_MS      3000L
-
-void loop()
-{
-  Blynk.run();
-
-  // This unadvised blocking task is used to demonstrate the blocking effects onto the execution and accuracy to Software timer
-  // You see the time elapse of ISR_Timer still accurate, whereas very unaccurate for Software Timer
-  // The time elapse for 2000ms software timer now becomes 3000ms (BLOCKING_TIME_MS)
-  // While that of ISR_Timer is still prefect.
-  delay(BLOCKING_TIME_MS);
-
-  // You need this Software timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary
-  // You don't need to and never call ISR_Timer.run() here in the loop(). It's already handled by ISR timer.
-  blynkTimer.run();
-}
-```
 ---
 ---
 
@@ -814,7 +544,7 @@ While software timer, **programmed for 2s, is activated after 4.867s !!!**. Then
 
 ```
 Starting ISR_Timer_Complex_Ethernet on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 20.00, _count = 10000
@@ -904,7 +634,7 @@ The following is the sample terminal output when running example [**TimerInterru
 
 ```
 Starting TimerInterruptTest on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 1.00, _count = 1000000
@@ -944,7 +674,7 @@ The following is the sample terminal output when running example [**Argument_Non
 
 ```
 Starting Argument_None on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 1.00, _count = 1000000
@@ -977,7 +707,7 @@ In this example, 16 independent ISR Timers are used, yet utilized just one Hardw
 
 ```
 Starting ISR_16_Timers_Array_Complex on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 100.00, _count = 10000
@@ -1128,7 +858,7 @@ The following is the sample terminal output when running example [**SwitchDeboun
 
 ```
 Starting SwitchDebounce on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 100.00, _count = 10000
@@ -1163,7 +893,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER4, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 2.00, _count = 500000
@@ -1207,7 +937,7 @@ The following is the sample terminal output when running example [FakeAnalogWrit
 
 ```
 Starting FakeAnalogWrite on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.0
+NRF52TimerInterrupt v1.4.1
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER3, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 10000.00, _count = 100
@@ -1336,6 +1066,8 @@ Submit issues to: [NRF52_TimerInterrupt issues](https://github.com/khoih-prog/NR
 5. Add Table of Contents
 6. Fix `multiple-definitions` linker error
 7. Optimize library code by using `reference-passing` instead of `value-passing`
+8. Add support to `Sparkfun Pro nRF52840 Mini`
+
 
 ---
 ---
