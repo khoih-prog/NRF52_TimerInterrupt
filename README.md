@@ -131,8 +131,9 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ### Currently supported Boards
 
-  - **AdaFruit Feather nRF52832, nRF52840 Express, BlueFruit Sense, Itsy-Bitsy nRF52840 Express, Metro nRF52840 Express, NINA_B302_ublox, NINA_B112_ublox etc.**
-  - **Sparkfun Pro nRF52840 Mini**
+1. **AdaFruit Feather nRF52832, nRF52840 Express, BlueFruit Sense, Itsy-Bitsy nRF52840 Express, Metro nRF52840 Express, NINA_B302_ublox, NINA_B112_ublox etc.**
+2. **Sparkfun Pro nRF52840 Mini**
+3. **Seeeduino nRF52840-based boards such as SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE**, etc. using Seeeduino `nRF%2` core
 
 ---
 
@@ -150,17 +151,19 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
  1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
  2. [`Adafruit nRF52 v1.3.0+`](https://github.com/adafruit/Adafruit_nRF52_Arduino) for nRF52 boards such as Adafruit NRF52840_FEATHER, NRF52832_FEATHER, NRF52840_FEATHER_SENSE, NRF52840_ITSYBITSY, NRF52840_CIRCUITPLAY, NRF52840_CLUE, NRF52840_METRO, NRF52840_PCA10056, PARTICLE_XENON, **NINA_B302_ublox**, etc. [![GitHub release](https://img.shields.io/github/release/adafruit/Adafruit_nRF52_Arduino.svg)](https://github.com/adafruit/Adafruit_nRF52_Arduino/releases/latest)
- 3. [`Blynk library 1.0.1`](https://github.com/blynkkk/blynk-library/releases). [![Latest release](https://img.shields.io/github/release/blynkkk/blynk-library.svg)](https://github.com/blynkkk/blynk-library/releases/latest/) to use with certain example.
- 4. To use with certain example, depending on which Ethernet card you're using:
-   - [`Ethernet library v2.0.0+`](https://github.com/arduino-libraries/Ethernet) for W5100, W5200 and W5500.  [![GitHub release](https://img.shields.io/github/release/arduino-libraries/Ethernet.svg)](https://github.com/arduino-libraries/Ethernet/releases/latest)
+ 3. `Seeeduino nRF52 core 1.0.0+` for Seeeduino nRF52840-based boards such as **Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE**. [![GitHub release](https://img.shields.io/github/release/Seeed-Studio/Adafruit_nRF52_Arduino.svg)](https://github.com/Seeed-Studio/Adafruit_nRF52_Arduino/releases/latest)
+ 4. [`Blynk library 1.1.0`](https://github.com/blynkkk/blynk-library/releases). [![Latest release](https://img.shields.io/github/release/blynkkk/blynk-library.svg)](https://github.com/blynkkk/blynk-library/releases/latest/) to use with certain example.
+ 5. To use with certain example, depending on which Ethernet card you're using:
+   - [`Ethernet_Generic library v2.6.1+`](https://github.com/khoih-prog/Ethernet_Generic) for W5100, W5200 and W5500.  [![GitHub release](https://img.shields.io/github/release/khoih-prog/Ethernet_Generic.svg)](https://github.com/khoih-prog/Ethernet_Generic/releases/latest)
+   - [`Ethernet library v2.0.1+`](https://github.com/arduino-libraries/Ethernet) for W5100, W5200 and W5500.  [![GitHub release](https://img.shields.io/github/release/arduino-libraries/Ethernet.svg)](https://github.com/arduino-libraries/Ethernet/releases/latest)
    - [`EthernetLarge library v2.0.0+`](https://github.com/OPEnSLab-OSU/EthernetLarge) for W5100, W5200 and W5500.
    - [`Ethernet2 library v1.0.4+`](https://github.com/khoih-prog/Ethernet2) for W5500. [![GitHub release](https://img.shields.io/github/release/adafruit/Ethernet2.svg)](https://github.com/adafruit/Ethernet2/releases/latest)
    - [`Ethernet3 library v1.5.5+`](https://github.com/sstaub/Ethernet3) for W5500/WIZ550io/WIZ850io/USR-ES1 with Wiznet W5500 chip. [![GitHub release](https://img.shields.io/github/release/sstaub/Ethernet3.svg)](https://github.com/sstaub/Ethernet3/releases/latest)
-   - [`EthernetENC library v2.0.2+`](https://github.com/jandrassy/EthernetENC) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/jandrassy/EthernetENC.svg)](https://github.com/jandrassy/EthernetENC/releases/latest). **New and Better**
-   - [`UIPEthernet library v2.0.11+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/UIPEthernet/UIPEthernet.svg)](https://github.com/UIPEthernet/UIPEthernet/releases/latest)
- 5. [`WiFiNINA_Generic library v1.8.14-3+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
- 6. [`Blynk_WiFiNINA_WM library 1.1.2+`](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
- 7. To use with certain example
+   - [`EthernetENC library v2.0.3+`](https://github.com/jandrassy/EthernetENC) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/jandrassy/EthernetENC.svg)](https://github.com/jandrassy/EthernetENC/releases/latest). **New and Better**
+   - [`UIPEthernet library v2.0.12+`](https://github.com/UIPEthernet/UIPEthernet) for ENC28J60. [![GitHub release](https://img.shields.io/github/release/UIPEthernet/UIPEthernet.svg)](https://github.com/UIPEthernet/UIPEthernet/releases/latest)
+ 6. [`WiFiNINA_Generic library v1.8.14-6+`](https://github.com/khoih-prog/WiFiNINA_Generic) to use WiFiNINA modules/shields. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/WiFiNINA_Generic.svg?)](https://www.ardu-badge.com/WiFiNINA_Generic) if using WiFiNINA for boards such as nRF52, etc.
+ 7. [`Blynk_WiFiNINA_WM library 1.1.2+`](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) to use with Blynk-WiFiNINA-related example. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiNINA_WM.svg?)](https://www.ardu-badge.com/Blynk_WiFiNINA_WM)
+ 8. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
    
 ---
@@ -186,7 +189,7 @@ Another way to install is to:
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**NRF52_TimerInterrupt** library](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt) by using [Library Manager](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**NRF52_TimerInterrupt** library](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt) or [**NRF52_TimerInterrupt** library](https://registry.platformio.org/libraries/khoih-prog/NRF52_TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/11399/NRF52_TimerInterrupt/installation). Search for **NRF52_TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
@@ -297,7 +300,7 @@ The current library implementation, using `xyz-Impl.h` instead of standard `xyz.
 
 You can include `.hpp`
 
-```
+```cpp
 // Can be included as many times as necessary, without `Multiple Definitions` Linker Error
 #include "NRF52TimerInterrupt.hpp"     //https://github.com/khoih-prog/NRF52_TimerInterrupt
 
@@ -307,7 +310,7 @@ You can include `.hpp`
 
 in many files. But be sure to use the following `.h` files **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-```
+```cpp
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "NRF52TimerInterrupt.h"       //https://github.com/khoih-prog/NRF52_TimerInterrupt
 
@@ -341,7 +344,7 @@ Before using any Timer, you have to make sure the Timer has not been used by any
 
 ### 1.1 Init Hardware Timer
 
-```
+```cpp
 // Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
 // If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
 
@@ -353,7 +356,7 @@ NRF52Timer ITimer(NRF_TIMER_1);
 
 Use one of these functions with **interval in unsigned long milliseconds**
 
-```
+```cpp
 // interval (in microseconds).
 // No params and duration now. To be added in the future by adding similar functions here or to NRF52-hal-timer.c
 bool setInterval(unsigned long interval, timerCallback callback);
@@ -366,7 +369,7 @@ bool attachInterruptInterval(unsigned long interval, timerCallback callback);
 as follows
 
 
-```
+```cpp
 void TimerHandler(void)
 {
   // Doing something here inside ISR
@@ -391,7 +394,7 @@ void setup()
 
 Use one of these functions with **frequency in float Hz**
 
-```
+```cpp
 // frequency (in hertz).
 // No params and duration now. To be added in the future by adding similar functions here or to NRF52-hal-timer.c
 bool setFrequency(float frequency, timerCallback callback);
@@ -402,7 +405,7 @@ bool attachInterrupt(float frequency, timerCallback callback);
 
 as follows
 
-```
+```cpp
 void TimerHandler0()
 {
   // Doing something here inside ISR
@@ -433,7 +436,7 @@ The 16 ISR_based Timers, designed for long timer intervals, only support using *
 
 ### 2.2 Init Hardware Timer and ISR-based Timer
 
-```
+```cpp
 /// Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1-NRF_TIMER_4 (1 to 4)
 // If you select the already-used NRF_TIMER_0, it'll be auto modified to use NRF_TIMER_1
 
@@ -447,7 +450,7 @@ NRF52_ISR_Timer ISR_Timer;
 
 ### 2.3 Set Hardware Timer Interval and attach Timer Interrupt Handler functions
 
-```
+```cpp
 void TimerHandler(void)
 {
   ISR_Timer.run();
@@ -529,7 +532,7 @@ void setup()
 
 ### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
-https://github.com/khoih-prog/NRF52_TimerInterrupt/blob/29768a617f3fe4accc2f1115623b3e093a9cc6e9/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L35-L366
+https://github.com/khoih-prog/NRF52_TimerInterrupt/blob/3cdaf91d2c2fd952dd81f60246ff8bbaffdcf7df/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L35-L381
 
 
 ---
@@ -545,7 +548,7 @@ While software timer, **programmed for 2s, is activated after 4.867s !!!**. Then
 
 ```
 Starting ISR_Timer_Complex_Ethernet on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 20.00, _count = 10000
@@ -635,7 +638,7 @@ The following is the sample terminal output when running example [**TimerInterru
 
 ```
 Starting TimerInterruptTest on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 1.00, _count = 1000000
@@ -675,7 +678,7 @@ The following is the sample terminal output when running example [**Argument_Non
 
 ```
 Starting Argument_None on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 1.00, _count = 1000000
@@ -708,7 +711,7 @@ In this example, 16 independent ISR Timers are used, yet utilized just one Hardw
 
 ```
 Starting ISR_16_Timers_Array_Complex on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER2, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 100.00, _count = 10000
@@ -859,7 +862,7 @@ The following is the sample terminal output when running example [**SwitchDeboun
 
 ```
 Starting SwitchDebounce on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER1, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 100.00, _count = 10000
@@ -894,7 +897,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER4, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 2.00, _count = 500000
@@ -938,7 +941,7 @@ The following is the sample terminal output when running example [FakeAnalogWrit
 
 ```
 Starting FakeAnalogWrite on NRF52840_FEATHER
-NRF52TimerInterrupt v1.4.1
+NRF52TimerInterrupt v1.4.2
 CPU Frequency = 64 MHz
 [TISR] F_CPU (MHz) = 64, Timer = NRF_TIMER3, Timer Clock (Hz) = 1000000.00
 [TISR] Frequency = 10000.00, _count = 100
@@ -1060,15 +1063,16 @@ Submit issues to: [NRF52_TimerInterrupt issues](https://github.com/khoih-prog/NR
 
 ## DONE
 
-1. Basic hardware timers for NRF52832 and NRF52840.
-2. More hardware-initiated software-enabled timers
-3. Longer time interval
-4. Similar features for remaining Arduino boards such as AVR, ESP32, ESP8266, STM32, SAM-DUE, SAMD21/SAMD51, mbed-nRF52, Teensy, etc.
-5. Add Table of Contents
-6. Fix `multiple-definitions` linker error
-7. Optimize library code by using `reference-passing` instead of `value-passing`
-8. Add support to `Sparkfun Pro nRF52840 Mini`
-
+ 1. Basic hardware timers for `NRF52832` and `NRF52840`
+ 2. More hardware-initiated software-enabled timers
+ 3. Longer time interval
+ 4. Similar features for remaining Arduino boards such as AVR, ESP32, ESP8266, STM32, SAM-DUE, SAMD21/SAMD51, mbed-nRF52, Teensy, etc.
+ 5. Add Table of Contents
+ 6. Fix `multiple-definitions` linker error
+ 7. Optimize library code by using `reference-passing` instead of `value-passing`
+ 8. Add support to `Sparkfun Pro nRF52840 Mini`
+ 9. Add support to Seeeduino nRF52840-based boards such as **SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE**, etc. using Seeeduino `nRF%2` core
+10. Add astyle using `allman` style. Restyle the library
 
 ---
 ---
