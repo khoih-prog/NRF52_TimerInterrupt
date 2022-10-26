@@ -19,7 +19,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.1
+  Version: 1.4.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -31,13 +31,14 @@
   1.3.0   K.Hoang      13/08/2021 Add support to Adafruit nRF52 core v0.22.0+
   1.4.0   K.Hoang      21/01/2022 Fix `multiple-definitions` linker error. Fix bug
   1.4.1   K.Hoang      03/03/2022 Add support to Sparkfun Pro nRF52840 Mini
+  1.4.2   K.Hoang      03/03/2022 26/10/2022 Add support to Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE
 *****************************************************************************************************************************/
 /*
   nRF52 has 5 Hardware TIMERs: NRF_TIMER0-NRF_TIMER4
   NRF_TIMER0 is used by the soft device, NRF_TIMER1-NRF_TIMER4 are available
-  
+
   Defined in file ./adafruit/hardware/nrf52/0.21.0/cores/nRF5/nordic/nrfx/mdk/nrf52.h
-  
+
   #define NRF_TIMER0_BASE             0x40008000UL
   #define NRF_TIMER1_BASE             0x40009000UL
   #define NRF_TIMER2_BASE             0x4000A000UL
@@ -51,9 +52,9 @@
   #define NRF_TIMER4                  ((NRF_TIMER_Type*)         NRF_TIMER4_BASE)
 
   ===============================================================================
-  
+
   Defined in ./adafruit/hardware/nrf52/0.21.0/cores/nRF5/nordic/nrfx/hal/nrf_timer.h
-  
+
   Timer prescalers
   typedef enum
   {
@@ -68,7 +69,7 @@
       NRF_TIMER_FREQ_62500Hz,   ///< Timer frequency 62500 Hz.
       NRF_TIMER_FREQ_31250Hz    ///< Timer frequency 31250 Hz.
   } nrf_timer_frequency_t;
-  
+
 */
 #pragma once
 
@@ -80,53 +81,63 @@
 
 #include "TimerInterrupt_Generic_Debug.h"
 
+////////////////////////////////////////
+
 // Timer 0 is used by the soft device but Timer 1, 2, 3 and 4 are available
-extern "C" void TIMER1_IRQHandler() 
+extern "C" void TIMER1_IRQHandler()
 {
-  if (nRF52Timers[1]) 
+  if (nRF52Timers[1])
   {
     nRF52Timers[1]->detachInterrupt();
-    
+
     (*(nRF52Timers[1]->getCallback()))();
-    
+
     nRF52Timers[1]->enableTimer();
   }
 }
 
-extern "C" void TIMER2_IRQHandler() 
+////////////////////////////////////////
+
+extern "C" void TIMER2_IRQHandler()
 {
-  if (nRF52Timers[2]) 
+  if (nRF52Timers[2])
   {
     nRF52Timers[2]->detachInterrupt();
-    
+
     (*(nRF52Timers[2]->getCallback()))();
-    
+
     nRF52Timers[2]->enableTimer();
   }
 }
 
-extern "C" void TIMER3_IRQHandler() 
+////////////////////////////////////////
+
+extern "C" void TIMER3_IRQHandler()
 {
-  if (nRF52Timers[3]) 
+  if (nRF52Timers[3])
   {
     nRF52Timers[3]->detachInterrupt();
-    
+
     (*(nRF52Timers[3]->getCallback()))();
-    
+
     nRF52Timers[3]->enableTimer();
   }
 }
 
-extern "C" void TIMER4_IRQHandler() 
+////////////////////////////////////////
+
+extern "C" void TIMER4_IRQHandler()
 {
-  if (nRF52Timers[4]) 
+  if (nRF52Timers[4])
   {
     nRF52Timers[4]->detachInterrupt();
-    
+
     (*(nRF52Timers[4]->getCallback()))();
-    
+
     nRF52Timers[4]->enableTimer();
   }
 }
+
+////////////////////////////////////////
 
 #endif    // NRF52_TIMER_INTERRUPT_IMPL_H

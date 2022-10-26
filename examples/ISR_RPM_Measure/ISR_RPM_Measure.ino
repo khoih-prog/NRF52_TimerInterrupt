@@ -34,13 +34,6 @@
    then use timer to count the time between active state
 */
 
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -56,11 +49,19 @@
 //#endif
 
 #ifndef LED_BLUE_PIN
-  #define LED_BLUE_PIN          9
+  #if defined(LED_BLUE)
+    #define LED_BLUE_PIN          LED_BLUE
+  #else
+    #define LED_BLUE_PIN          7
+  #endif
 #endif
 
-#ifndef LED_RED
-  #define LED_RED               8
+#ifndef LED_GREEN_PIN
+  #if defined(LED_GREEN)
+    #define LED_GREEN_PIN           LED_GREEN
+  #else
+    #define LED_GREEN_PIN           8
+  #endif
 #endif
 
 unsigned int interruptPin = 7;
@@ -106,8 +107,10 @@ void TimerHandler1()
       avgRPM = ( 2 * avgRPM + RPM) / 3,
 
 #if (TIMER_INTERRUPT_DEBUG > 0)
-      Serial.print("RPM = "); Serial.print(avgRPM);
-      Serial.print(", rotationTime ms = "); Serial.println(rotationTime * TIMER1_INTERVAL_MS);
+      Serial.print("RPM = ");
+      Serial.print(avgRPM);
+      Serial.print(", rotationTime ms = ");
+      Serial.println(rotationTime * TIMER1_INTERVAL_MS);
 #endif
 
       rotationTime = 0;
@@ -125,9 +128,12 @@ void TimerHandler1()
   {
     // If idle, set RPM to 0, don't increase rotationTime
     RPM = 0;
-    
-#if (TIMER_INTERRUPT_DEBUG > 0) 
-    Serial.print("RPM = "); Serial.print(RPM); Serial.print(", rotationTime = "); Serial.println(rotationTime);
+
+#if (TIMER_INTERRUPT_DEBUG > 0)
+    Serial.print("RPM = ");
+    Serial.print(RPM);
+    Serial.print(", rotationTime = ");
+    Serial.println(rotationTime);
 #endif
 
     rotationTime = 0;
@@ -141,20 +147,25 @@ void TimerHandler1()
 void setup()
 {
   pinMode(interruptPin, INPUT_PULLUP);
-  
+
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(100);
-  
-  Serial.print(F("\nStarting ISR_RPM_Measure on ")); Serial.println(BOARD_NAME);
+
+  Serial.print(F("\nStarting ISR_RPM_Measure on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // Interval in microsecs, must multiply to 1000 here or crash
   if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler1))
   {
-    Serial.print(F("Starting  ITimer1 OK, millis() = ")); Serial.println(millis());
+    Serial.print(F("Starting  ITimer1 OK, millis() = "));
+    Serial.println(millis());
   }
   else
     Serial.println(F("Can't set ITimer1. Select another freq. or timer"));

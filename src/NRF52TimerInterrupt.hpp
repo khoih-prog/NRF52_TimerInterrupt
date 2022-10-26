@@ -19,7 +19,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.1
+  Version: 1.4.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -31,6 +31,7 @@
   1.3.0   K.Hoang      13/08/2021 Add support to Adafruit nRF52 core v0.22.0+
   1.4.0   K.Hoang      21/01/2022 Fix `multiple-definitions` linker error. Fix bug
   1.4.1   K.Hoang      03/03/2022 Add support to Sparkfun Pro nRF52840 Mini
+  1.4.2   K.Hoang      03/03/2022 26/10/2022 Add support to Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE
 *****************************************************************************************************************************/
 /*
   nRF52 has 5 Hardware TIMERs: NRF_TIMER0-NRF_TIMER4
@@ -75,25 +76,44 @@
 #ifndef NRF52_TIMER_INTERRUPT_HPP
 #define NRF52_TIMER_INTERRUPT_HPP
 
+////////////////////////////////////////
+
 #if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
       defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
       defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
+      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) || \
+      defined(ARDUINO_Seeed_XIAO_nRF52840) || defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) )
+  #error This code is designed to run on Adafruit or Seeed nRF52 platform! Please check your Tools->Board setting.
 #endif
+
+////////////////////////////////////////
+
+#if !defined(BOARD_NAME)
+	#if defined(ARDUINO_Seeed_XIAO_nRF52840)
+		#define BOARD_NAME		"Seeed_XIAO_nRF52840"
+	#elif defined(ARDUINO_Seeed_XIAO_nRF52840_Sense)
+		#define BOARD_NAME		"Seeed_XIAO_nRF52840_Sense"
+	#endif
+#endif
+
+////////////////////////////////////////
 
 #include <Arduino.h>
 #include "nrf_timer.h"
 
+////////////////////////////////////////
+
 #ifndef NRF52_TIMER_INTERRUPT_VERSION
-  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.0"
+  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.2"
   
   #define NRF52_TIMER_INTERRUPT_VERSION_MAJOR      1
   #define NRF52_TIMER_INTERRUPT_VERSION_MINOR      4
-  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      0
+  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      2
 
-  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004000  
+  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004002
 #endif
+
+////////////////////////////////////////
 
 #include "TimerInterrupt_Generic_Debug.h"
 
@@ -102,6 +122,8 @@ class NRF52TimerInterrupt;
 typedef NRF52TimerInterrupt NRF52Timer;
 
 typedef void (*timerCallback)  ();
+
+////////////////////////////////////////
 
 typedef enum
 {
@@ -113,6 +135,8 @@ typedef enum
   NRF_MAX_TIMER
 } NRF52TimerNumber;
 
+////////////////////////////////////////
+
 static const char* NRF52TimerName[NRF_MAX_TIMER] =
 {
   "NRF_TIMER0-DON'T_USE_THIS",
@@ -121,6 +145,8 @@ static const char* NRF52TimerName[NRF_MAX_TIMER] =
   "NRF_TIMER3",
   "NRF_TIMER4",
 };
+
+////////////////////////////////////////
 
 /*
 typedef enum
@@ -136,6 +162,8 @@ typedef enum
 } nrf_timer_cc_channel_t;
 */
 
+////////////////////////////////////////
+
 class NRF52TimerInterrupt;
 
 static NRF_TIMER_Type* nrf_timers    [NRF_MAX_TIMER] = { NRF_TIMER0, NRF_TIMER1, NRF_TIMER2, NRF_TIMER3, NRF_TIMER4 };
@@ -143,6 +171,8 @@ static NRF_TIMER_Type* nrf_timers    [NRF_MAX_TIMER] = { NRF_TIMER0, NRF_TIMER1,
 static IRQn_Type       nrf_timers_irq[NRF_MAX_TIMER] = { TIMER0_IRQn, TIMER1_IRQn, TIMER2_IRQn, TIMER3_IRQn, TIMER4_IRQn };
 
 static NRF52TimerInterrupt*  nRF52Timers [NRF_MAX_TIMER] = { NULL, NULL, NULL, NULL, NULL };
+
+////////////////////////////////////////
 
 class NRF52TimerInterrupt
 {
@@ -164,6 +194,8 @@ class NRF52TimerInterrupt
     uint32_t              _timerCount;      // count to activate timer
 
   public:
+
+    ////////////////////////////////////////
 
     NRF52TimerInterrupt(uint8_t timer = NRF_TIMER_1)
     {
@@ -217,11 +249,15 @@ class NRF52TimerInterrupt
         break;            
       } 
     };
+
+    ////////////////////////////////////////
     
     ~NRF52TimerInterrupt()
     {
       nRF52Timers[_timer] = NULL;
     }
+
+    ////////////////////////////////////////
 
     // frequency (in hertz) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
@@ -271,6 +307,8 @@ class NRF52TimerInterrupt
       return true;
     }
 
+    ////////////////////////////////////////
+
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
     bool setInterval(const unsigned long& interval, timerCallback callback)
@@ -278,10 +316,14 @@ class NRF52TimerInterrupt
       return setFrequency((float) (1000000.0f / interval), callback);
     }
 
+    ////////////////////////////////////////
+
     bool attachInterrupt(const float& frequency, timerCallback callback)
     {
       return setFrequency(frequency, callback);
     }
+
+    ////////////////////////////////////////
 
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to NRF52-hal-timer.c
@@ -289,6 +331,8 @@ class NRF52TimerInterrupt
     {
       return setFrequency( (float) ( 1000000.0f / interval), callback);
     }
+
+    ////////////////////////////////////////
 
     void detachInterrupt()
     {
@@ -306,16 +350,22 @@ class NRF52TimerInterrupt
       nrf_timer_event_clear(nrf_timer, event);
     }
 
+    ////////////////////////////////////////
+
     void disableTimer()
     {
       detachInterrupt();
     }
+
+    ////////////////////////////////////////
 
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     void reattachInterrupt()
     {
       setFrequency(_frequency, _callback);
     }
+
+    ////////////////////////////////////////
 
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     void enableTimer()
@@ -335,27 +385,37 @@ class NRF52TimerInterrupt
       nrf_timer_cc_set(nrf_timer, cc_channel, _timerCount);
     }
 
+    ////////////////////////////////////////
+
     // Just stop clock source, clear the count
     void stopTimer()
     {
       disableTimer();
     }
 
+    ////////////////////////////////////////
+
     // Just reconnect clock source, start current count from 0
     void restartTimer()
     {
       enableTimer();
     }
+
+    ////////////////////////////////////////
     
-    timerCallback getCallback()
+    inline timerCallback getCallback()
     {
       return _callback;
     }
+
+    ////////////////////////////////////////
     
-    IRQn_Type getTimerIRQn()
+    inline IRQn_Type getTimerIRQn()
     {
       return _timer_IRQ;
     }
+
+    ////////////////////////////////////////   
 }; // class NRF52TimerInterrupt
 
 #endif    // NRF52_TIMER_INTERRUPT_HPP

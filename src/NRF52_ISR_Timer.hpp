@@ -19,7 +19,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.1
+  Version: 1.4.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -31,6 +31,7 @@
   1.3.0   K.Hoang      13/08/2021 Add support to Adafruit nRF52 core v0.22.0+
   1.4.0   K.Hoang      21/01/2022 Fix `multiple-definitions` linker error. Fix bug
   1.4.1   K.Hoang      03/03/2022 Add support to Sparkfun Pro nRF52840 Mini
+  1.4.2   K.Hoang      03/03/2022 26/10/2022 Add support to Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE
 *****************************************************************************************************************************/
 
 #pragma once
@@ -41,19 +42,34 @@
 #if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
       defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
       defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
+      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) || \
+      defined(ARDUINO_Seeed_XIAO_nRF52840) || defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) )
+  #error This code is designed to run on Adafruit or Seeed nRF52 platform! Please check your Tools->Board setting.
 #endif
 
+////////////////////////////////////////
+
+#if !defined(BOARD_NAME)
+	#if defined(ARDUINO_Seeed_XIAO_nRF52840)
+		#define BOARD_NAME		"Seeed_XIAO_nRF52840"
+	#elif defined(ARDUINO_Seeed_XIAO_nRF52840_Sense)
+		#define BOARD_NAME		"Seeed_XIAO_nRF52840_Sense"
+	#endif
+#endif
+
+////////////////////////////////////////
+
 #ifndef NRF52_TIMER_INTERRUPT_VERSION
-  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.1"
+  #define NRF52_TIMER_INTERRUPT_VERSION       "NRF52TimerInterrupt v1.4.2"
   
   #define NRF52_TIMER_INTERRUPT_VERSION_MAJOR      1
   #define NRF52_TIMER_INTERRUPT_VERSION_MINOR      4
-  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      1
+  #define NRF52_TIMER_INTERRUPT_VERSION_PATCH      2
 
-  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004001
+  #define NRF52_TIMER_INTERRUPT_VERSION_INT        1004002
 #endif
+
+////////////////////////////////////////
 
 #include "TimerInterrupt_Generic_Debug.h"
 
@@ -69,14 +85,17 @@
   #endif
 #endif
 
+////////////////////////////////////////
+
 #define NRF52_ISR_Timer NRF52_ISRTimer
 
 typedef void (*timerCallback)();
 typedef void (*timerCallback_p)(void *);
 
+////////////////////////////////////////
+
 class NRF52_ISR_Timer 
 {
-
   public:
     // maximum number of timers
 #define MAX_NUMBER_TIMERS         16
@@ -151,11 +170,15 @@ class NRF52_ISR_Timer
     // returns the number of used timers
     unsigned getNumTimers();
 
+    ////////////////////////////////////////
+
     // returns the number of available timers
-    unsigned getNumAvailableTimers() 
+    inline unsigned getNumAvailableTimers() 
     {
       return MAX_NUMBER_TIMERS - numTimers;
     };
+
+    ////////////////////////////////////////
 
   private:
     // deferred call constants
@@ -171,6 +194,8 @@ class NRF52_ISR_Timer
     // find the first available slot
     int findFirstFreeSlot();
 
+    ////////////////////////////////////////
+
     typedef struct 
     {
       unsigned long prev_millis;        // value returned by the millis() function in the previous run() call
@@ -184,11 +209,12 @@ class NRF52_ISR_Timer
       unsigned      toBeCalled;         // deferred function call (sort of) - N.B.: only used in run()
     } timer_t;
 
+    ////////////////////////////////////////
+
     volatile timer_t timer[MAX_NUMBER_TIMERS];
 
     // actual number of timers in use (-1 means uninitialized)
     volatile int numTimers;
 };
-
 
 #endif    // ISR_TIMER_GENERIC_HPP

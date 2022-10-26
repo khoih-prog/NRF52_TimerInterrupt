@@ -41,13 +41,6 @@
    written
 */
 
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
 #define BLYNK_PRINT Serial
 
 //#define BLYNK_DEBUG
@@ -71,8 +64,8 @@
   char auth[] = "******";
   char server[] = "blynk-cloud.com";
 #endif
-  
-  #define BLYNK_HARDWARE_PORT       8080
+
+#define BLYNK_HARDWARE_PORT       8080
 
 #if !(USE_BUILTIN_ETHERNET || USE_UIP_ETHERNET)
   #define W5100_CS  10
@@ -123,7 +116,6 @@ BlynkTimer blynkTimer;
 void TimerHandler()
 {
   static bool toggle  = false;
-  static bool started = false;
   static int timeRun  = 0;
 
   ISR_Timer.run();
@@ -132,12 +124,6 @@ void TimerHandler()
   if (++timeRun == (LED_TOGGLE_INTERVAL_MS / HW_TIMER_INTERVAL_MS) )
   {
     timeRun = 0;
-
-    if (!started)
-    {
-      started = true;
-      pinMode(LED_BUILTIN, OUTPUT);
-    }
 
     //timer interrupt toggles pin LED_BUILTIN
     digitalWrite(LED_BUILTIN, toggle);
@@ -150,14 +136,15 @@ void TimerHandler()
 // Or you can get this run-time error / crash
 void doingSomething2s()
 {
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
 
   if (previousMillis > TIMER_INTERVAL_2S)
   {
-    Serial.print("2s: Delta ms = "); Serial.println(deltaMillis);
+    Serial.print("2s: Delta ms = ");
+    Serial.println(deltaMillis);
   }
 
   previousMillis = millis();
@@ -169,14 +156,15 @@ void doingSomething2s()
 // Or you can get this run-time error / crash
 void doingSomething5s()
 {
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
 
   if (previousMillis > TIMER_INTERVAL_5S)
   {
-    Serial.print("5s: Delta ms = "); Serial.println(deltaMillis);
+    Serial.print("5s: Delta ms = ");
+    Serial.println(deltaMillis);
   }
 
   previousMillis = millis();
@@ -188,14 +176,15 @@ void doingSomething5s()
 // Or you can get this run-time error / crash
 void doingSomething11s()
 {
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
 
   if (previousMillis > TIMER_INTERVAL_11S)
   {
-    Serial.print("11s: Delta ms = "); Serial.println(deltaMillis);
+    Serial.print("11s: Delta ms = ");
+    Serial.println(deltaMillis);
   }
 
   previousMillis = millis();
@@ -207,14 +196,15 @@ void doingSomething11s()
 // Or you can get this run-time error / crash
 void doingSomething101s()
 {
-#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)  
+#if (NRF52_TIMER_INTERRUPT_DEBUG > 0)
   static unsigned long previousMillis = lastMillis;
   unsigned long deltaMillis = millis() - previousMillis;
 
 
   if (previousMillis > TIMER_INTERVAL_101S)
   {
-    Serial.print("101s: Delta ms = "); Serial.println(deltaMillis);
+    Serial.print("101s: Delta ms = ");
+    Serial.println(deltaMillis);
   }
 
   previousMillis = millis();
@@ -230,23 +220,31 @@ void doingSomething101s()
 void blynkDoingSomething2s()
 {
   static unsigned long previousMillis = lastMillis;
-  
-  Serial.print(F("blynkDoingSomething2s: Delta programmed ms = ")); Serial.print(BLYNK_TIMER_MS);
-  Serial.print(F(", actual = ")); Serial.println(millis() - previousMillis);
-  
+
+  Serial.print(F("blynkDoingSomething2s: Delta programmed ms = "));
+  Serial.print(BLYNK_TIMER_MS);
+  Serial.print(F(", actual = "));
+  Serial.println(millis() - previousMillis);
+
   previousMillis = millis();
 }
 
 void setup()
 {
+  pinMode(LED_BUILTIN, OUTPUT);
+
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(100);
-  
-  Serial.print(F("\nStarting ISR_Timer_Complex_WiFiNINA on ")); Serial.println(BOARD_NAME);
+
+  Serial.print(F("\nStarting ISR_Timer_Complex_WiFiNINA on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
   blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);
@@ -255,7 +253,8 @@ void setup()
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
     lastMillis = millis();
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
+    Serial.print(F("Starting ITimer OK, millis() = "));
+    Serial.println(lastMillis);
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));
@@ -284,7 +283,8 @@ void setup()
 
   if (Blynk.connected())
   {
-    Serial.print(F("IP = ")); Serial.println(WiFi.localIP());
+    Serial.print(F("IP = "));
+    Serial.println(WiFi.localIP());
   }
 }
 

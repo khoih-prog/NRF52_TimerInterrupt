@@ -19,7 +19,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.1
+  Version: 1.4.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -31,6 +31,7 @@
   1.3.0   K.Hoang      13/08/2021 Add support to Adafruit nRF52 core v0.22.0+
   1.4.0   K.Hoang      21/01/2022 Fix `multiple-definitions` linker error. Fix bug
   1.4.1   K.Hoang      03/03/2022 Add support to Sparkfun Pro nRF52840 Mini
+  1.4.2   K.Hoang      03/03/2022 26/10/2022 Add support to Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE
 *****************************************************************************************************************************/
 
 #pragma once

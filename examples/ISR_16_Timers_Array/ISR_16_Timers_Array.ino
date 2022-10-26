@@ -32,13 +32,6 @@
    written
 */
 
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -58,12 +51,20 @@
   #define LED_BUILTIN       13
 #endif
 
-#ifndef LED_BLUE
-  #define LED_BLUE          7
+#ifndef LED_BLUE_PIN
+  #if defined(LED_BLUE)
+    #define LED_BLUE_PIN          LED_BLUE
+  #else
+    #define LED_BLUE_PIN          7
+  #endif
 #endif
 
-#ifndef LED_RED
-  #define LED_RED           8
+#ifndef LED_GREEN_PIN
+  #if defined(LED_GREEN)
+    #define LED_GREEN_PIN           LED_GREEN
+  #else
+    #define LED_GREEN_PIN           8
+  #endif
 #endif
 
 #define HW_TIMER_INTERVAL_US      10000L
@@ -116,10 +117,10 @@ uint32_t TimerInterval[NUMBER_ISR_TIMERS] =
 
 void doingSomething(int index)
 {
-unsigned long currentMillis  = millis();
+  unsigned long currentMillis  = millis();
 
-deltaMillis[index]    = currentMillis - previousMillis[index];
-previousMillis[index] = currentMillis;
+  deltaMillis[index]    = currentMillis - previousMillis[index];
+  previousMillis[index] = currentMillis;
 }
 
 // In NRF52, avoid doing something fancy in ISR, for example Serial.print()
@@ -231,13 +232,17 @@ void simpleTimerDoingSomething2s()
 
   unsigned long currMillis = millis();
 
-  Serial.printf("SimpleTimer : %lus, ms = %lu, Dms : %lu\n", SIMPLE_TIMER_MS / 1000, currMillis, currMillis - previousMillis);
+  Serial.printf("SimpleTimer : %lus, ms = %lu, Dms : %lu\n", SIMPLE_TIMER_MS / 1000, currMillis,
+                currMillis - previousMillis);
 
   for (int i = 0; i < NUMBER_ISR_TIMERS; i++)
   {
-    Serial.print(F("Timer : ")); Serial.print(i);
-    Serial.print(F(", programmed : ")); Serial.print(TimerInterval[i]);
-    Serial.print(F(", actual : ")); Serial.println(deltaMillis[i]);
+    Serial.print(F("Timer : "));
+    Serial.print(i);
+    Serial.print(F(", programmed : "));
+    Serial.print(TimerInterval[i]);
+    Serial.print(F(", actual : "));
+    Serial.println(deltaMillis[i]);
   }
 
   previousMillis = currMillis;
@@ -248,19 +253,24 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(100);
-  
-  Serial.print(F("\nStarting ISR_16_Timers_Array on ")); Serial.println(BOARD_NAME);
+
+  Serial.print(F("\nStarting ISR_16_Timers_Array on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_US, TimerHandler))
   {
     startMillis = millis();
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(startMillis);
+    Serial.print(F("Starting ITimer OK, millis() = "));
+    Serial.println(startMillis);
   }
   else
     Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));

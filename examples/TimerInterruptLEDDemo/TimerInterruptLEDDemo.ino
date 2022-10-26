@@ -25,13 +25,6 @@
    or the entire sequence of your code which accesses the data.
 */
 
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -44,11 +37,19 @@
 //#endif
 
 #ifndef LED_BLUE_PIN
-  #define LED_BLUE_PIN          7
+  #if defined(LED_BLUE)
+    #define LED_BLUE_PIN          LED_BLUE
+  #else
+    #define LED_BLUE_PIN          7
+  #endif
 #endif
 
-#ifndef LED_RED
-  #define LED_RED               8
+#ifndef LED_GREEN_PIN
+  #if defined(LED_GREEN)
+    #define LED_GREEN_PIN           LED_GREEN
+  #else
+    #define LED_GREEN_PIN           8
+  #endif
 #endif
 
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
@@ -92,41 +93,46 @@ void doingSomething1()
 
 void doingSomething2()
 {
-  digitalWrite(LED_BLUE, !digitalRead(LED_BLUE));
+  digitalWrite(LED_BLUE_PIN, !digitalRead(LED_BLUE_PIN));
 
 #if (TIMER_INTERRUPT_DEBUG > 0)
   Serial.println("B");
-#endif  
+#endif
 }
 void doingSomething3()
 {
-  digitalWrite(LED_RED, !digitalRead(LED_RED));
+  digitalWrite(LED_GREEN_PIN, !digitalRead(LED_GREEN_PIN));
 
 #if (TIMER_INTERRUPT_DEBUG > 0)
   Serial.println("R");
-#endif  
+#endif
 }
 
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(100);
-  
-  Serial.print(F("\nStarting TimerInterruptLEDDemo on ")); Serial.println(BOARD_NAME);
+
+  Serial.print(F("\nStarting TimerInterruptLEDDemo on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // configure pin in output mode
-  pinMode(LED_BUILTIN,  OUTPUT);
-  pinMode(LED_BLUE,     OUTPUT);
-  pinMode(LED_RED,      OUTPUT);
+  pinMode(LED_BUILTIN,    OUTPUT);
+  pinMode(LED_BLUE_PIN,   OUTPUT);
+  pinMode(LED_GREEN_PIN,  OUTPUT);
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(millis());
+    Serial.print(F("Starting ITimer OK, millis() = "));
+    Serial.println(millis());
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));

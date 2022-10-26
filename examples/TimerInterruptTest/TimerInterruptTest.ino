@@ -24,13 +24,6 @@
    or the entire sequence of your code which accesses the data.
 */
 
-#if !(defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
-      defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || \
-      defined(NRF52840_CLUE) || defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || \
-      defined(NRF52840_LED_GLASSES) || defined(MDBT50Q_RX) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
-  #error This code is designed to run on Adafruit nRF52 platform! Please check your Tools->Board setting.
-#endif
-
 // These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -45,12 +38,20 @@
 //  #define LED_BUILTIN         3
 //#endif
 
-#ifndef LED_BLUE
-  #define LED_BLUE              7
+#ifndef LED_BLUE_PIN
+  #if defined(LED_BLUE)
+    #define LED_BLUE_PIN          LED_BLUE
+  #else
+    #define LED_BLUE_PIN          7
+  #endif
 #endif
 
-#ifndef LED_RED
-  #define LED_RED               8
+#ifndef LED_GREEN_PIN
+  #if defined(LED_GREEN)
+    #define LED_GREEN_PIN           LED_GREEN
+  #else
+    #define LED_GREEN_PIN           8
+  #endif
 #endif
 
 unsigned int SWPin = 11;
@@ -74,7 +75,7 @@ static bool toggle1 = false;
 NRF52Timer ITimer0(NRF_TIMER_1);
 
 void TimerHandler0()
-{  
+{
   preMillisTimer0 = millis();
 
   //timer interrupt toggles pin LED_BUILTIN
@@ -90,29 +91,34 @@ void TimerHandler1()
   preMillisTimer1 = millis();
 
   //timer interrupt toggles outputPin
-  digitalWrite(LED_BLUE, toggle1);
+  digitalWrite(LED_BLUE_PIN, toggle1);
   toggle1 = !toggle1;
 }
 
 void setup()
 {
   pinMode(LED_BUILTIN,  OUTPUT);
-  pinMode(LED_BLUE,     OUTPUT);
-  
+  pinMode(LED_BLUE_PIN, OUTPUT);
+
   Serial.begin(115200);
-  while (!Serial);
-  
+
+  while (!Serial && millis() < 5000);
+
   delay(100);
-  
-  Serial.print(F("\nStarting TimerInterruptTest on ")); Serial.println(BOARD_NAME);
+
+  Serial.print(F("\nStarting TimerInterruptTest on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // Interval in microsecs
   if (ITimer0.attachInterruptInterval(TIMER0_INTERVAL_MS * 1000, TimerHandler0))
   {
     preMillisTimer0 = millis();
-    Serial.print(F("Starting  ITimer0 OK, millis() = ")); Serial.println(preMillisTimer0);
+    Serial.print(F("Starting  ITimer0 OK, millis() = "));
+    Serial.println(preMillisTimer0);
   }
   else
     Serial.println(F("Can't set ITimer0. Select another freq. or timer"));
@@ -121,7 +127,8 @@ void setup()
   if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler1))
   {
     preMillisTimer1 = millis();
-    Serial.print(F("Starting ITimer1 OK, millis() = ")); Serial.println(preMillisTimer1);
+    Serial.print(F("Starting ITimer1 OK, millis() = "));
+    Serial.println(preMillisTimer1);
   }
   else
     Serial.println(F("Can't set ITimer1. Select another freq. or timer"));
@@ -129,12 +136,12 @@ void setup()
 
 void loop()
 {
-  static unsigned long lastTimer0   = 0; 
+  static unsigned long lastTimer0   = 0;
   static bool timer0Stopped         = false;
-  
+
   static unsigned long lastTimer1   = 0;
   static bool timer1Stopped         = false;
-  
+
 
   if (millis() - lastTimer0 > TIMER0_DURATION_MS)
   {
@@ -143,14 +150,17 @@ void loop()
     if (timer0Stopped)
     {
       preMillisTimer0 = millis();
-      Serial.print(F("Start ITimer0, millis() = ")); Serial.println(preMillisTimer0);
+      Serial.print(F("Start ITimer0, millis() = "));
+      Serial.println(preMillisTimer0);
       ITimer0.restartTimer();
     }
     else
     {
-      Serial.print(F("Stop ITimer0, millis() = ")); Serial.println(millis());
+      Serial.print(F("Stop ITimer0, millis() = "));
+      Serial.println(millis());
       ITimer0.stopTimer();
     }
+
     timer0Stopped = !timer0Stopped;
   }
 
@@ -161,15 +171,17 @@ void loop()
     if (timer1Stopped)
     {
       preMillisTimer1 = millis();
-      Serial.print(F("Start ITimer1, millis() = ")); Serial.println(preMillisTimer1);
+      Serial.print(F("Start ITimer1, millis() = "));
+      Serial.println(preMillisTimer1);
       ITimer1.restartTimer();
     }
     else
     {
-      Serial.print(F("Stop ITimer1, millis() = ")); Serial.println(millis());
+      Serial.print(F("Stop ITimer1, millis() = "));
+      Serial.println(millis());
       ITimer1.stopTimer();
     }
-    
+
     timer1Stopped = !timer1Stopped;
   }
 }

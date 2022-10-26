@@ -12,6 +12,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v1.4.2](#releases-v142)
   * [Releases v1.4.1](#releases-v141)
   * [Releases v1.4.0](#releases-v140)
   * [Releases v1.3.0](#releases-v130)
@@ -25,6 +26,12 @@
 ---
 
 ## Changelog
+
+### Releases v1.4.2
+
+1. Add support to Seeeduino nRF52840-based boards such as **Seeed_XIAO_NRF52840 and Seeed_XIAO_NRF52840_SENSE**, etc. using Seeeduino `nRF52` core
+2. Add astyle using `allman` style. Restyle the library
+3. Update all examples
 
 ### Releases v1.4.1
 
